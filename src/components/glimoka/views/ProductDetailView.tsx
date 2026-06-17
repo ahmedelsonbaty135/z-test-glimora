@@ -20,6 +20,7 @@ import {
   ZoomIn,
   Camera,
   X,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,7 +83,7 @@ interface ProductDetail {
 }
 
 export function ProductDetailView() {
-  const { selectedProductSlug, openProduct, addToCart, setView, toggleWishlist, wishlist, addRecentlyViewed } = useShopStore();
+  const { selectedProductSlug, openProduct, addToCart, setView, toggleWishlist, wishlist, addRecentlyViewed, toggleBackInStockSub, backInStockSubs } = useShopStore();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [related, setRelated] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -585,18 +586,43 @@ export function ProductDetailView() {
           )}
 
           {/* Quantity + actions */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center border-2 border-rose-gold/30 rounded-xl overflow-hidden bg-white">
-              <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3 hover:bg-cream-dark transition-colors" aria-label="إنقاص">
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="w-12 text-center font-bold text-warm-black">{qty}</span>
-              <button onClick={() => setQty((q) => Math.min(product.stock, q + 1))} className="p-3 hover:bg-cream-dark transition-colors" aria-label="زيادة">
-                <Plus className="w-4 h-4" />
+          {product.stock > 0 ? (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center border-2 border-rose-gold/30 rounded-xl overflow-hidden bg-white">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3 hover:bg-cream-dark transition-colors" aria-label="إنقاص">
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-12 text-center font-bold text-warm-black">{qty}</span>
+                <button onClick={() => setQty((q) => Math.min(product.stock, q + 1))} className="p-3 hover:bg-cream-dark transition-colors" aria-label="زيادة">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              <span className="text-xs text-warm-gray">المخزون: {product.stock} قطعة</span>
+            </div>
+          ) : (
+            <div className="bg-danger-soft/10 border border-danger-soft/30 rounded-xl p-4">
+              <p className="text-sm font-bold text-danger-soft mb-2">⚠️ نفد المخزون مؤقتًا</p>
+              <p className="text-xs text-warm-gray mb-3">سجل برقمك وسيصلك إشعار واتساب فور توفر المنتج</p>
+              <button
+                onClick={() => {
+                  toggleBackInStockSub(product.id);
+                  toast.success(
+                    backInStockSubs.includes(product.id)
+                      ? "تم إلغاء الاشتراك"
+                      : "تم الاشتراك! سنخبرك فور التوفر 🔔"
+                  );
+                }}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-colors ${
+                  backInStockSubs.includes(product.id)
+                    ? "bg-emerald-soft/10 text-emerald-soft border border-emerald-soft/30"
+                    : "bg-burgundy text-white hover:bg-burgundy-deep"
+                }`}
+              >
+                <Bell className="w-4 h-4" />
+                {backInStockSubs.includes(product.id) ? "✓ مشترك — اضغط للإلغاء" : "أخبرني عند التوفر"}
               </button>
             </div>
-            <span className="text-xs text-warm-gray">المخزون: {product.stock} قطعة</span>
-          </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button onClick={handleAddToCart} size="lg" className="bg-burgundy hover:bg-burgundy-deep h-12 text-base">

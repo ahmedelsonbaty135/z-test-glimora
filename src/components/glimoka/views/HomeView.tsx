@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { ProductCard, type ProductCardData } from "../ProductCard";
+import { BundleCard, type Bundle } from "../BundleCard";
 import { Button } from "@/components/ui/button";
 import { formatEGP } from "@/lib/utils";
 import { toast } from "sonner";
@@ -628,6 +629,9 @@ export function HomeView() {
         </motion.div>
       </section>
 
+      {/* ===== BUNDLE DEALS ===== */}
+      <BundlesSection />
+
       {/* ===== GIFT CARDS PROMO BANNER ===== */}
       <section className="container mx-auto px-4">
         <motion.button
@@ -746,3 +750,103 @@ function ProductGridSkeleton({ count }: { count: number }) {
     </div>
   );
 }
+
+// ===== BUNDLES SECTION =====
+function BundlesSection() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/products?limit=100")
+      .then((r) => r.json())
+      .then((data) => {
+        setProducts(data.products || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading || products.length === 0) return null;
+
+  // Build bundles dynamically from products
+  const findProduct = (slug: string) => products.find((p) => p.slug === slug);
+  const buildBundle = (
+    id: string,
+    title: string,
+    description: string,
+    slugs: string[],
+    discountPct: number,
+    badge: string,
+    accent: string
+  ): Bundle | null => {
+    const items = slugs.map(findProduct).filter(Boolean);
+    if (items.length !== slugs.length) return null;
+    const originalTotal = items.reduce((s, p) => s + p.basePrice, 0);
+    return {
+      id,
+      title,
+      description,
+      products: items.map((p) => ({
+        productId: p.id,
+        slug: p.slug,
+        name: p.name,
+        image: p.images[0]?.url || "/products/placeholder.jpg",
+        basePrice: p.basePrice,
+        stock: p.stock,
+        metalOptions: p.metalOptions,
+      })),
+      originalTotal,
+      bundlePrice: Math.round(originalTotal * (1 - discountPct / 100)),
+      badge,
+      accent,
+    };
+  };
+
+  const bundles: Bundle[] = [
+    buildBundle(
+      "couples",
+      "باقة الأزواج الرومانسية",
+      "سوار مزدوج بالاسمين + قلادة قلب — الهدية المثالية للخطوبة والذكرى السنوية",
+      ["dual-name-bracelet", "heart-name-necklace"],
+      20,
+      "وفّر 20%",
+      "#E8B4B8"
+    ),
+    buildBundle(
+      "gold-luxury",
+      "باقة الذهب الفاخرة",
+      "سوار ذهبي 18 + قلادة ذهبية + خاتم ذهبي — تشكيلة كاملة بخصم حصري",
+      ["gold-18k-name-bracelet", "gold-name-necklace", "gold-name-ring"],
+      15,
+      "وفّر 15%",
+      "#D4AF37"
+    ),
+    buildBundle(
+      "silver-everyday",
+      "باقة الفضة اليومية",
+      "سوار فضي + قلادة فضية + خاتم فضي — إطلالة أنيقة بأسعار مميزة",
+      ["silver-name-bracelet", "silver-name-necklace", "silver-name-ring"],
+      18,
+      "وفّر 18%",
+      "#C0C0C0"
+    ),
+  ].filter(Boolean) as Bundle[];
+
+  if (bundles.length === 0) return null;
+
+  return (
+    <section className="container mx-auto px-4">
+      <SectionHeading
+        eyebrow="عروض حصرية"
+        title="باقات موفّرة"
+        subtitle="اشترِ مجموعة ووفّر أكثر — مجموعات مختارة بعناية لكل المناسبات"
+      />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
+        {bundles.map((b) => (
+          <BundleCard key={b.id} bundle={b} />
+        ))}
+      </div>
+    </section>
+  );
+}
+

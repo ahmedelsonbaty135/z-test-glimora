@@ -10,6 +10,7 @@ import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingB
 import { ProductCard, type ProductCardData } from "../ProductCard";
 import { WishlistCard } from "../WishlistCard";
 import { AddressBook } from "../AddressBook";
+import { LoyaltyTierCard } from "../LoyaltyTierCard";
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -433,6 +434,9 @@ export function AccountView() {
               <span className="mr-auto font-black text-burgundy text-xl">{loyaltyBalance}</span>
             </div>
           </div>
+
+          {/* Loyalty Tier System */}
+          <LoyaltyTierCard />
         </TabsContent>
 
         {/* Settings */}

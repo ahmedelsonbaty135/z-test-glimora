@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { BrandLogo } from "./BrandLogo";
-import { cn } from "@/lib/utils";
+import { cn, formatEGP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -99,6 +99,8 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const cartCount = items.reduce((s, i) => s + i.quantity, 0);
 
@@ -108,11 +110,55 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Debounced autocomplete
+  useEffect(() => {
+    if (!localSearch.trim() || localSearch.trim().length < 2) {
+      Promise.resolve().then(() => setSuggestions([]));
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/products?limit=100`);
+        const data = await res.json();
+        if (cancelled) return;
+        const q = localSearch.toLowerCase().trim();
+        const matches = (data.products || [])
+          .filter((p: any) =>
+            p.name.toLowerCase().includes(q) ||
+            p.shortDesc?.toLowerCase().includes(q) ||
+            p.category?.name?.toLowerCase().includes(q) ||
+            p.material?.toLowerCase().includes(q)
+          )
+          .slice(0, 5);
+        if (!cancelled) {
+          setSuggestions(matches);
+          setShowSuggestions(true);
+        }
+      } catch {
+        // ignore
+      }
+    }, 200);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [localSearch]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(localSearch);
     setView("products", { category: selectedCategory || undefined });
     setSearchOpen(false);
+    setShowSuggestions(false);
+  };
+
+  const handleSuggestionClick = (slug: string) => {
+    setSearchOpen(false);
+    setShowSuggestions(false);
+    setLocalSearch("");
+    setView("product");
+    useShopStore.getState().openProduct(slug);
   };
 
   const handleNavClick = (view: ViewName, category?: string) => {
@@ -247,20 +293,65 @@ export function Header() {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
+                className="overflow-visible"
               >
-                <div className="pb-3 flex gap-2">
-                  <Input
-                    autoFocus
-                    value={localSearch}
-                    onChange={(e) => setLocalSearch(e.target.value)}
-                    placeholder="ابحث عن سوار، قلادة، خاتم..."
-                    className="bg-white border-rose-gold/40 focus-visible:ring-rose-gold"
-                  />
-                  <Button type="submit" className="bg-burgundy hover:bg-burgundy-deep shrink-0">
-                    <Search className="w-4 h-4 ml-1" />
-                    بحث
-                  </Button>
+                <div className="pb-3 relative">
+                  <div className="flex gap-2">
+                    <Input
+                      autoFocus
+                      value={localSearch}
+                      onChange={(e) => setLocalSearch(e.target.value)}
+                      onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                      placeholder="ابحث عن سوار، قلادة، خاتم..."
+                      className="bg-white border-rose-gold/40 focus-visible:ring-rose-gold"
+                    />
+                    <Button type="submit" className="bg-burgundy hover:bg-burgundy-deep shrink-0">
+                      <Search className="w-4 h-4 ml-1" />
+                      بحث
+                    </Button>
+                  </div>
+                  {/* Autocomplete suggestions */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute top-full right-0 left-0 mt-1 bg-white rounded-xl shadow-luxury-lg border border-rose-gold/30 overflow-hidden z-50"
+                    >
+                      <p className="text-[11px] text-warm-gray px-3 py-2 bg-cream-dark border-b border-rose-gold/15 font-semibold">
+                        اقتراحات البحث
+                      </p>
+                      {suggestions.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onMouseDown={() => handleSuggestionClick(p.slug)}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-cream-dark transition-colors text-right"
+                        >
+                          <img
+                            src={p.images[0]?.url || "/products/placeholder.jpg"}
+                            alt={p.name}
+                            className="w-10 h-10 rounded-lg object-cover shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-warm-black line-clamp-1">{p.name}</p>
+                            <p className="text-xs text-warm-gray line-clamp-1">
+                              {p.category?.name} • {p.shortDesc}
+                            </p>
+                          </div>
+                          <span className="text-sm font-bold text-burgundy shrink-0">
+                            {formatEGP(p.basePrice)}
+                          </span>
+                        </button>
+                      ))}
+                      <button
+                        type="submit"
+                        className="w-full text-center text-xs text-burgundy hover:bg-cream-dark py-2 border-t border-rose-gold/15 font-semibold"
+                      >
+                        عرض كل النتائج ←
+                      </button>
+                    </motion.div>
+                  )}
                 </div>
               </motion.form>
             )}

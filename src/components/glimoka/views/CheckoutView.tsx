@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 
 export function CheckoutView() {
-  const { items, setView, coupon, clearCart, setLastOrder, user, login, loyaltyBalance, useLoyaltyPoints, addLoyalty } = useShopStore();
+  const { items, setView, coupon, clearCart, setLastOrder, user, login, loyaltyBalance, useLoyaltyPoints, addLoyalty, addTotalSpend } = useShopStore();
   const [form, setForm] = useState({
     guestName: user?.name || "",
     guestPhone: "",
@@ -109,6 +109,7 @@ export function CheckoutView() {
       if (earned > 0) {
         addLoyalty(earned);
       }
+      addTotalSpend(total);
       setLastOrder(data.orderNumber);
       clearCart();
       setView("thankyou");

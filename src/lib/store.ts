@@ -100,6 +100,8 @@ interface ShopState {
   // Loyalty
   loyaltyBalance: number;
   useLoyaltyPoints: boolean;
+  totalSpend: number; // lifetime spend for tier calculation
+  backInStockSubs: string[]; // productIds user subscribed to
 
   // Compare
   compareList: string[]; // productIds (max 3)
@@ -157,6 +159,8 @@ interface ShopState {
   setLoyaltyBalance: (n: number) => void;
   addLoyalty: (n: number) => void;
   setUseLoyaltyPoints: (v: boolean) => void;
+  addTotalSpend: (n: number) => void;
+  toggleBackInStockSub: (productId: string) => void;
 }
 
 function makeLineId(item: Omit<CartItem, "id">) {
@@ -189,6 +193,8 @@ export const useShopStore = create<ShopState>()(
 
       loyaltyBalance: 0,
       useLoyaltyPoints: false,
+      totalSpend: 0,
+      backInStockSubs: [],
 
       compareList: [],
       addresses: [],
@@ -340,6 +346,15 @@ export const useShopStore = create<ShopState>()(
       setLoyaltyBalance: (n) => set({ loyaltyBalance: Math.max(0, n) }),
       addLoyalty: (n) => set({ loyaltyBalance: Math.max(0, get().loyaltyBalance + n) }),
       setUseLoyaltyPoints: (v) => set({ useLoyaltyPoints: v }),
+      addTotalSpend: (n) => set({ totalSpend: get().totalSpend + n }),
+      toggleBackInStockSub: (productId) => {
+        const subs = get().backInStockSubs;
+        set({
+          backInStockSubs: subs.includes(productId)
+            ? subs.filter((id) => id !== productId)
+            : [...subs, productId],
+        });
+      },
     }),
     {
       name: "glimoka-shop",
@@ -351,6 +366,8 @@ export const useShopStore = create<ShopState>()(
         user: s.user,
         lastOrderNumber: s.lastOrderNumber,
         loyaltyBalance: s.loyaltyBalance,
+        totalSpend: s.totalSpend,
+        backInStockSubs: s.backInStockSubs,
         compareList: s.compareList,
         addresses: s.addresses,
         giftCards: s.giftCards,

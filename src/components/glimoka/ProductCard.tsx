@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, ShoppingBag, Star, Eye, GitCompare } from "lucide-react";
+import { Heart, ShoppingBag, Star, Eye, GitCompare, Flame } from "lucide-react";
 import { motion } from "framer-motion";
 import { useShopStore, type CartItem } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -166,11 +166,19 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           <p className="text-xs text-warm-gray line-clamp-1 mb-2">{product.shortDesc}</p>
         )}
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <Star className="w-3.5 h-3.5 fill-rose-gold text-rose-gold" />
-          <span className="text-xs font-semibold text-warm-black">{product.rating.toFixed(1)}</span>
-          <span className="text-xs text-warm-gray">({product.reviewCount})</span>
+        {/* Rating + Sold */}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-1">
+            <Star className="w-3.5 h-3.5 fill-rose-gold text-rose-gold" />
+            <span className="text-xs font-semibold text-warm-black">{product.rating.toFixed(1)}</span>
+            <span className="text-xs text-warm-gray">({product.reviewCount})</span>
+          </div>
+          {(product as any).soldCount > 50 && (
+            <span className="text-[10px] text-emerald-soft font-semibold flex items-center gap-0.5">
+              <Flame className="w-3 h-3" />
+              {((product as any).soldCount > 200 ? "200+" : (product as any).soldCount)} مبيع
+            </span>
+          )}
         </div>
 
         {/* Price */}
@@ -187,12 +195,25 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
           <button
             onClick={quickAdd}
-            className="w-9 h-9 rounded-full bg-burgundy hover:bg-burgundy-deep text-white flex items-center justify-center transition-colors shrink-0"
+            className="w-9 h-9 rounded-full bg-burgundy hover:bg-burgundy-deep text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95 shrink-0"
             aria-label="أضف للسلة"
           >
             <ShoppingBag className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Low stock indicator */}
+        {product.stock > 0 && product.stock <= 15 && (
+          <div className="mt-2 flex items-center gap-1 text-[10px] text-danger-soft font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-danger-soft animate-pulse" />
+            باقي {product.stock} قطع فقط — اطلب الآن!
+          </div>
+        )}
+        {product.stock === 0 && (
+          <div className="mt-2 text-[10px] text-danger-soft font-bold">
+            نفد المخزون
+          </div>
+        )}
       </div>
     </motion.div>
   );

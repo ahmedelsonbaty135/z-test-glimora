@@ -94,3 +94,102 @@ export function calcLoyaltyDiscount(loyaltyBalance: number, useLoyalty: boolean,
   const maxDiscount = Math.floor(subtotal * 0.3);
   return Math.min(loyaltyBalance, maxDiscount);
 }
+
+// Loyalty Tier System — based on total lifetime spend (EGP)
+export interface LoyaltyTier {
+  id: string;
+  name: string;
+  nameEn: string;
+  minSpend: number;
+  color: string;
+  bg: string;
+  icon: string;
+  perks: string[];
+  discountPercent: number; // tier-based discount on all orders
+  freeShippingThreshold: number; // lower threshold for free shipping
+  pointsMultiplier: number; // earn points faster
+}
+
+export const LOYALTY_TIERS: LoyaltyTier[] = [
+  {
+    id: "bronze",
+    name: "برونزي",
+    nameEn: "Bronze",
+    minSpend: 0,
+    color: "#92400E",
+    bg: "#FEF3C7",
+    icon: "🥉",
+    perks: ["1 نقطة لكل 10 ج.م", "شحن مجاني فوق 1000 ج.م", "وصول مبكر للعروض"],
+    discountPercent: 0,
+    freeShippingThreshold: 1000,
+    pointsMultiplier: 1,
+  },
+  {
+    id: "silver",
+    name: "فضي",
+    nameEn: "Silver",
+    minSpend: 3000,
+    color: "#6B7280",
+    bg: "#F3F4F6",
+    icon: "🥈",
+    perks: ["خصم 5% على كل الطلبات", "شحن مجاني فوق 800 ج.م", "نقاط مضاعفة أيام الثلاثاء", "دعم أولوية واتساب"],
+    discountPercent: 5,
+    freeShippingThreshold: 800,
+    pointsMultiplier: 1.2,
+  },
+  {
+    id: "gold",
+    name: "ذهبي",
+    nameEn: "Gold",
+    minSpend: 8000,
+    color: "#D4AF37",
+    bg: "#FEF9C3",
+    icon: "🥇",
+    perks: ["خصم 10% على كل الطلبات", "شحن مجاني على كل الطلبات", "نقاط مضاعفة دائمًا (1.5×)", "هدية عيد ميلاد", "معاينة المنتجات الجديدة"],
+    discountPercent: 10,
+    freeShippingThreshold: 0,
+    pointsMultiplier: 1.5,
+  },
+  {
+    id: "platinum",
+    name: "بلاتيني",
+    nameEn: "Platinum",
+    minSpend: 20000,
+    color: "#9CA3AF",
+    bg: "#F1F5F9",
+    icon: "💎",
+    perks: ["خصم 15% على كل الطلبات", "شحن مجاني على كل الطلبات", "نقاط مضاعفة دائمًا (2×)", "استشارة مجوهرات شخصية مجانية", "نقش مجاني على أي منتج", "ضمان استبدال مدى الحياة"],
+    discountPercent: 15,
+    freeShippingThreshold: 0,
+    pointsMultiplier: 2,
+  },
+];
+
+export function getLoyaltyTier(totalSpend: number): LoyaltyTier {
+  let tier = LOYALTY_TIERS[0];
+  for (const t of LOYALTY_TIERS) {
+    if (totalSpend >= t.minSpend) tier = t;
+  }
+  return tier;
+}
+
+export function getNextTier(totalSpend: number): LoyaltyTier | null {
+  for (const t of LOYALTY_TIERS) {
+    if (totalSpend < t.minSpend) return t;
+  }
+  return null; // already at highest tier
+}
+
+export function getTierProgress(totalSpend: number): { current: LoyaltyTier; next: LoyaltyTier | null; progress: number; remaining: number } {
+  const current = getLoyaltyTier(totalSpend);
+  const next = getNextTier(totalSpend);
+  if (!next) {
+    return { current, next: null, progress: 100, remaining: 0 };
+  }
+  const range = next.minSpend - current.minSpend;
+  const spent = totalSpend - current.minSpend;
+  const progress = Math.min(100, Math.round((spent / range) * 100));
+  const remaining = next.minSpend - totalSpend;
+  return { current, next, progress, remaining };
+}
+

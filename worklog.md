@@ -656,3 +656,111 @@ Generating 34 jewelry images via z-ai-web-dev-sdk (hero, 4 categories, 3 brand, 
 7. Add product availability notifications (back-in-stock alerts)
 8. Add advanced search with autocomplete suggestions
 
+
+---
+
+## Task ID: 12 — Cron Round 6: Loyalty Tiers + Bundle Deals + Back-in-Stock + Search Autocomplete + Card Polish (Completed by main agent)
+
+**Trigger:** Recurring cron job (webDevReview)
+
+**Work Log:**
+
+### QA Findings
+- ✅ Lint clean (0 errors)
+- ✅ No runtime/console errors on fresh load
+- ✅ All views tested: home, products, product detail, cart, checkout, account (5 tabs), admin (6 tabs)
+- ✅ All previous features working (compare, gift cards, address book, abandoned cart, review photos, wishlist sharing)
+
+### New Features Added
+
+#### 1. Customer Loyalty Tier System (Bronze/Silver/Gold/Platinum)
+- **Utility functions** (`src/lib/utils.ts`): Added `LoyaltyTier` interface, `LOYALTY_TIERS` array (4 tiers), `getLoyaltyTier()`, `getNextTier()`, `getTierProgress()` functions
+  - **Bronze** (0 EGP): 1× points, free shipping >1000, early offers
+  - **Silver** (3000 EGP): 5% discount, 1.2× points, free shipping >800, priority WhatsApp
+  - **Gold** (8000 EGP): 10% discount, 1.5× points, free shipping always, birthday gift, early access
+  - **Platinum** (20000 EGP): 15% discount, 2× points, free shipping, personal consultation, free engraving, lifetime warranty
+- **Store additions**: `totalSpend: number`, `addTotalSpend()` action — persisted. CheckoutView calls `addTotalSpend(total)` on order completion.
+- **LoyaltyTierCard component** (NEW `src/components/glimoka/LoyaltyTierCard.tsx`):
+  - Current tier card with icon, name, total spend, points balance
+  - Animated progress bar to next tier with gradient fill + shimmer sweep
+  - "أنفق X إضافية للوصول للمستوى التالي" message
+  - Current tier perks grid (2-column with checkmarks)
+  - All 4 tiers overview grid with current/passed/locked states
+- **AccountView integration**: Added LoyaltyTierCard below profile info in "الملف" tab
+- **Verified**: Bronze tier shows, progress 0% to Silver, "أنفق ٣٬٠٠٠ ج.م إضافية" message ✓
+
+#### 2. Product Bundle Deals
+- **BundleCard component** (NEW `src/components/glimoka/BundleCard.tsx`): Card with:
+  - Gradient header with accent color, gift icon, badge
+  - Product thumbnails with "+" separators
+  - Price comparison: original total (strikethrough) vs bundle price vs savings (amount + %)
+  - "أضف الباقة للسلة" button with success state
+  - Adds all bundle products to cart with default customization
+- **BundlesSection** (in HomeView): Dynamically builds 3 bundles from products:
+  - "باقة الأزواج الرومانسية" (dual bracelet + heart necklace, 20% off, rose accent)
+  - "باقة الذهب الفاخرة" (gold bracelet + necklace + ring, 15% off, gold accent)
+  - "باقة الفضة اليومية" (silver bracelet + necklace + ring, 18% off, silver accent)
+- **Verified**: Clicked "أضف الباقة للسلة" → toast "تمت إضافة باقة 'باقة الأزواج الرومانسية' للسلة — وفّرت ٣٤٨ ج.م!" → cart increased ✓
+
+#### 3. Back-in-Stock Notifications
+- **Store additions**: `backInStockSubs: string[]`, `toggleBackInStockSub()` action — persisted
+- **ProductDetailView enhancement**: When `product.stock === 0`:
+  - Replaces quantity controls with red alert box: "⚠️ نفد المخزون مؤقتًا"
+  - "سجل برقمك وسيصلك إشعار واتساب فور توفر المنتج"
+  - "أخبرني عند التوفر" button (Bell icon) with toggle state
+  - When subscribed: green "✓ مشترك — اضغط للإلغاء" state
+  - Toast feedback on subscribe/unsubscribe
+- **Verified**: Stock display shows quantity controls when >0, subscribe UI ready for 0 stock ✓
+
+#### 4. Advanced Search Autocomplete
+- **Header enhancement**: Added debounced autocomplete to search bar
+  - 200ms debounce after typing 2+ characters
+  - Fetches all products, filters by name/shortDesc/category/material
+  - Shows up to 5 suggestions in dropdown:
+    - Product thumbnail (40x40)
+    - Product name + category + shortDesc
+    - Price in burgundy
+  - "عرض كل النتائج ←" footer to see all
+  - Click suggestion → opens product detail
+  - Proper blur handling (150ms delay to allow click)
+- **Verified**: Typed "سوار" → 3 suggestions appeared with images, names, prices ✓
+
+#### 5. Styling Polish — ProductCard Enhancements
+- **Sold count badge**: Products with >50 sales show "🔥 200+ مبيع" or "🔥 178 مبيع" next to rating
+- **Low stock indicator**: Products with ≤15 stock show pulsing red dot + "باقي X قطع فقط — اطلب الآن!"
+- **Out of stock label**: "نفد المخزون" in red when stock is 0
+- **Add-to-cart button**: Enhanced with hover:scale-110 and active:scale-95 micro-interactions
+- **Verified**: "200+ مبيع" badge visible on bestsellers, low stock "باقي 15 قطع" on engagement ring ✓
+
+### Files Modified/Created
+- `src/lib/utils.ts` — Added LoyaltyTier interface, LOYALTY_TIERS, getLoyaltyTier, getNextTier, getTierProgress
+- `src/lib/store.ts` — Added totalSpend, backInStockSubs state + actions, persisted
+- `src/components/glimoka/LoyaltyTierCard.tsx` — NEW: Tier display with progress + perks + all tiers
+- `src/components/glimoka/BundleCard.tsx` — NEW: Bundle deal card with add-to-cart
+- `src/components/glimoka/views/HomeView.tsx` — Added BundlesSection with 3 dynamic bundles
+- `src/components/glimoka/views/AccountView.tsx` — Added LoyaltyTierCard to profile tab
+- `src/components/glimoka/views/CheckoutView.tsx` — Call addTotalSpend on order completion
+- `src/components/glimoka/views/ProductDetailView.tsx` — Back-in-stock subscribe UI + Bell icon
+- `src/components/glimoka/Header.tsx` — Search autocomplete with debounced suggestions
+- `src/components/glimoka/ProductCard.tsx` — Sold count badge, low stock indicator, button micro-interactions, Flame icon
+
+### Verification Results
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime/console errors on fresh load
+- ✅ Loyalty tier: Bronze shows, progress bar to Silver, "أنفق ٣٬٠٠٠ ج.م" message
+- ✅ Bundles: 3 cards render, add to cart works with savings toast (348 EGP saved)
+- ✅ Back-in-stock: Subscribe UI ready for 0-stock products
+- ✅ Search autocomplete: "سوار" → 3 suggestions with images + prices
+- ✅ Product cards: "200+ مبيع" badges, low stock "باقي 15 قطع" indicators
+- ✅ All existing features still working
+
+### Next Phase Recommendations
+1. Apply tier discounts automatically at checkout (Silver 5%, Gold 10%, Platinum 15%)
+2. Add tier-based free shipping threshold logic in shipping calculation
+3. Add bundle-specific landing pages with SEO
+4. Implement actual back-in-stock email/WhatsApp sending via cron
+5. Add search trending keywords + recent searches
+6. Add product ratings breakdown filter (filter by 4+ stars)
+7. Add customer reviews summary AI analysis (sentiment)
+8. Add live order tracking map integration
+
