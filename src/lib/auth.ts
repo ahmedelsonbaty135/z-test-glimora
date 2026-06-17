@@ -13,6 +13,7 @@ import { db } from "@/lib/db";
  */
 
 const ADMIN_CODE_HEADER = "x-admin-code";
+const DEFAULT_ADMIN_CODE = "glimoka-admin-2024";
 
 // Cache the admin code for 60 seconds to avoid DB hit on every request
 let cachedAdminCode: { value: string | null; expires: number } = {
@@ -20,19 +21,28 @@ let cachedAdminCode: { value: string | null; expires: number } = {
   expires: 0,
 };
 
-async function getAdminCode(): Promise<string | null> {
+async function getAdminCode(): Promise<string> {
   const now = Date.now();
   if (cachedAdminCode.expires > now && cachedAdminCode.value !== null) {
     return cachedAdminCode.value;
   }
-  const settings = await db.setting.findMany();
-  const adminSetting = settings.find((s: any) => s.key === "adminAccessCode");
-  cachedAdminCode = {
-    value: adminSetting?.value || "glimoka-admin-2024",
-    expires: now + 60000,
-  };
+  try {
+    const settings = await db.setting.findMany();
+    const adminSetting = settings.find((s: any) => s.key === "adminAccessCode");
+    cachedAdminCode = {
+      value: adminSetting?.value || DEFAULT_ADMIN_CODE,
+      expires: now + 60000,
+    };
+  } catch (e) {
+    // If DB fails, use default code
+    cachedAdminCode = {
+      value: DEFAULT_ADMIN_CODE,
+      expires: now + 60000,
+    };
+  }
   return cachedAdminCode.value;
 }
+
 
 /**
  * Verify admin access from request headers.

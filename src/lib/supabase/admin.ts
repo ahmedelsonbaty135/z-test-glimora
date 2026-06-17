@@ -1,22 +1,28 @@
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Admin/Service Supabase client using the publishable key.
- * Used on the server side for privileged operations (bypasses RLS via service role).
- *
- * For the sandbox, we use the publishable key with permissive RLS policies.
- * In production, you'd use a service role key (never exposed to the client).
+ * Supabase configuration with hardcoded fallbacks.
+ * This ensures the app NEVER crashes even if .env is missing or not loaded.
+ * The values are the same as in .env — safe to use as defaults.
  */
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  }
-);
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://nhcrwxotomtnnardlzuq.supabase.co";
+const SUPABASE_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  "sb_publishable_9QYyvhQWC-w1xOeR_ymnBA_nOxnOLvL";
+
+/**
+ * Admin/Service Supabase client using the publishable key.
+ * Used on the server side for privileged operations.
+ */
+export const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+  },
+});
+
 
 /**
  * Snake_case to camelCase converter for row results
