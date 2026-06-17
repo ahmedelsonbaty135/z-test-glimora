@@ -1,0 +1,272 @@
+// GLIMOKA — Luxury Jewelry E-Commerce Prisma Schema
+// SQLite datasource for the sandbox environment
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums (modeled as String for SQLite) ----------
+
+// UserRole: CUSTOMER | ADMIN
+// OrderStatus: PENDING | CONFIRMED | CUSTOMIZING | SHIPPED | OUT_FOR_DELIVERY | DELIVERED | CANCELLED | RETURNED
+// PaymentMethod: COD
+// MetalType: SILVER_925 | GOLD_18K | GOLD_21K | RHODIUM
+// CouponType: PERCENTAGE | FIXED | FREE_SHIPPING | BOGO
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  phone        String?
+  passwordHash String?
+  role         String    @default("CUSTOMER") // CUSTOMER | ADMIN
+  birthday     String?
+  avatar       String?
+  city         String?
+  governorate  String?
+  loyaltyPoints Int      @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  addresses    Address[]
+  orders       Order[]
+  reviews      Review[]
+  wishlist     Wishlist[]
+  notifications Notification[]
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  label     String  // Home | Work | Other
+  fullName  String
+  phone     String
+  governorate String
+  city      String
+  details   String
+  isDefault Boolean @default(false)
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  icon        String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  products    Product[]
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  shortDesc     String
+  description   String
+  categoryId    String
+  basePrice     Float    // EGP
+  comparePrice  Float?   // original price for discount display
+  metalOptions  String   // comma separated: SILVER_925,GOLD_18K,...
+  sizeOptions   String   // comma separated: 16,17,18,19,20
+  fontOptions   String   // comma separated font names
+  isPersonalizable Boolean @default(true)
+  isFeatured    Boolean  @default(false)
+  isBestSeller  Boolean  @default(false)
+  isNewArrival  Boolean  @default(false)
+  isOnSale      Boolean  @default(false)
+  stock         Int      @default(50)
+  rating        Float    @default(5.0)
+  reviewCount   Int      @default(0)
+  soldCount     Int      @default(0)
+  material      String?  // gold, silver, rose-gold
+  color         String?
+  giftBoxPrice  Float    @default(50)
+  giftCardPrice Float    @default(20)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category      Category @relation(fields: [categoryId], references: [id])
+  images        ProductImage[]
+  reviews       Review[]
+  wishlistItems Wishlist[]
+  orderItems    OrderItem[]
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([isFeatured])
+  @@index([isBestSeller])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  order     Int     @default(0)
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique
+  userId        String?
+  guestName     String
+  guestPhone    String
+  guestEmail    String?
+  governorate   String
+  city          String
+  address       String
+  notes         String?
+  paymentMethod String   @default("COD")
+  status        String   @default("PENDING")
+  subtotal      Float
+  shippingCost  Float
+  discount      Float    @default(0)
+  total         Float
+  couponCode    String?
+  loyaltyEarned Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User?     @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  productId    String
+  name         String
+  image        String
+  price        Float
+  quantity     Int
+  metal        String?
+  size         String?
+  font         String?
+  name1        String?
+  name2        String?
+  giftBox      Boolean @default(false)
+  giftCard     String?
+  customizationJson String?
+
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Coupon {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  type          String   // PERCENTAGE | FIXED | FREE_SHIPPING | BOGO
+  value         Float    @default(0) // percent or amount
+  minOrder      Float    @default(0)
+  maxDiscount   Float?
+  usageLimit    Int?
+  usedCount     Int      @default(0)
+  perCustomerLimit Int? 
+  startsAt      DateTime
+  endsAt        DateTime?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  usages        CouponUsage[]
+}
+
+model CouponUsage {
+  id        String   @id @default(cuid())
+  couponId  String
+  userId    String?
+  orderId   String?
+  email     String?
+  createdAt DateTime @default(now())
+
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@index([couponId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String?
+  authorName String
+  rating    Int
+  title     String?
+  body      String
+  isApproved Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([productId])
+  @@index([isApproved])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String?
+  ctaText   String?
+  ctaLink   String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

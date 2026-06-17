@@ -1,0 +1,65 @@
+import type { Metadata } from "next";
+import { Cairo, Inter } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "GLIMOKA | مجوهرات شخصية فاخرة — أساور وقلائد بأسماء مخصصة",
+  description:
+    "GLIMOKA — متجر مجوهرات إلكتروني فاخر متخصص في المجوهرات الشخصية المخصصة. أساور وقلائد وخواتم بأسمائك. الدفع عند الاستلام. شحن لكل مصر.",
+  keywords: [
+    "مجوهرات",
+    "أساور بأسماء",
+    "قلائد مخصصة",
+    "GLIMOKA",
+    "مجوهرات مصر",
+    "هدايا شخصية",
+    "خواتم مخصصة",
+  ],
+  authors: [{ name: "GLIMOKA" }],
+  openGraph: {
+    title: "GLIMOKA | مجوهرات شخصية فاخرة",
+    description: "أساور وقلائد وخواتم بأسماء مخصصة. الدفع عند الاستلام.",
+    siteName: "GLIMOKA",
+    type: "website",
+    locale: "ar_EG",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GLIMOKA | مجوهرات شخصية فاخرة",
+    description: "أساور وقلائد وخواتم بأسماء مخصصة. الدفع عند الاستلام.",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <body
+        className={`${cairo.variable} ${inter.variable} font-sans antialiased bg-background text-foreground`}
+      >
+        {children}
+        <Toaster />
+        <SonnerToaster position="top-center" richColors closeButton />
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,726 @@
+GLIMOKA
+P R O D U C T   R E Q U I R E M E N T S   D O C U M E N T
+وثيقة مواصفات
+متجر مجوهرات إلكتروني
+مواصفات تفصيلية + Prompt جاهز للذكاء الاصطناعي
+التقنية: Next.js 14 + TypeScript + Tailwind + Prisma
+العملة: الجنيه المصري (EGP) | الدفع: عند الاستلام (COD)
+التصميم: GLIMOKA Brand (Burgundy + Cream + Rose Gold)
+تاريخ الإصدار: يونيو 2026  |  GLIMOKA © 2026
+١. مقدمة عامة
+تهدف هذه الوثيقة إلى تقديم مواصفات تفصيلية كاملة لمتجر إلكتروني فاخر متخصص في بيع المجوهرات الشخصية (أساور وقلائد بأسماء) مع إمكانية التخصيص. تم إعداد هذه الوثيقة بناءً على تحليل فيديو مرجعي لموقع مشابه (justuniques.shop) مع تطوير المميزات وإضافة عناصر الذكاء الاصطناعي.
+الوثيقة مقسمة إلى قسمين رئيسيين: القسم الأول يحتوي على المواصفات التفصيلية الكاملة للموقع (PRD) وهي موجهة للمطور أو الوكالة المنفذة. القسم الثاني يحتوي على Prompt جاهز للنسخ مباشرة إلى أي أداة ذكاء اصطناعي (Cursor, Claude, ChatGPT, v0, Lovable) لبناء الموقع خطوة بخطوة.
+الجمهور المستهدف من الموقع: عملاء من مصر بشكل أساسي، يبحثون عن مجوهرات شخصية مخصصة كهدية أو للاستخدام الشخصي. السعر متوسط إلى مرتفع، والتركيز على الجودة والتخصيص والخدمة المميزة عبر WhatsApp.
+٢. نظرة عامة على المشروع
+٢.٠ هوية البراند — GLIMOKA
+البراند اسمه GLIMOKA، ولوجو بيميزه لون خمري فاخر (Burgundy #6A1B35) كخلفية، مع نص أبيض نظيف وخط sans-serif حديث، ولمسات عضوية من خطوط منحنية ناعمة بلون خمري فاتح (#8B3A4F). الديزاين العام للوجو minimalist luxury مع إحساس بالدفء والنعومة. اسم البراند مكتوب بحروف لاتينية كبيرة (uppercase) مع letter-spacing عالي، وفيه لمسة سكاندينافية من الحرف Å المخصص.
+الشخصية اللي بيبثها البراند: فخامة معاصرة، دفء، أناقة، قرب من العميل (مش برود الفخامة الكلاسيكية). الموقع لازم يعكس نفس الشخصية — خمري وcreamي وذهبي وردي، مع مساحات بيضاء كتير، وصور احترافية، وأنيميشن سلس. اسم GLIMOKA لازم يظهر بوضوح في الهيدر بنفس ستايل اللوجو.
+٢.١ فكرة المشروع
+متجر إلكتروني فاخر لبيع المجوهرات الشخصية المخصصة (أساور، قلائد، خواتم) بحيث يستطيع العميل إدخال اسمه أو اسم شخص محب ويتم تصنيع القطعة خصيصاً له. الموقع يقدم تجربة مستخدم راقية مع إمكانية معاينة المنتج بشكل تفاعلي، والتواصل المباشر مع خدمة العملاء عبر WhatsApp لإتمام الطلب أو الاستفسار.
+٢.٢ الأهداف الرئيسية
+◆  توفير تجربة تسوق سلسة وأنيقة تليق بمنتجات المجوهرات الفاخرة
+◆  تمكين العميل من تخصيص المنتج (الاسم، الخط، المعدن، الحجم) بشكل مرئي وفوري
+◆  زيادة معدل التحويل من خلال نظام كوبونات خصم وعروض موسمية
+◆  بناء قاعدة عملاء ولاء من خلال نظام عضويات وحسابات شخصية
+◆  استخدام الذكاء الاصطناعي لتوصيات منتجات ذكية وchatbot للدعم الفوري
+◆  ربط الموقع بـ WhatsApp Business لإرسال إشعارات الطلبات وتأكيد التخصيصات
+٢.٣ الجمهور المستهدف
+العملاء المستهدفون هم من فئة المتوسط والمرتفع في مصر، أعمارهم من 18 إلى 45 سنة، يهتمون بالهدايا الشخصية والمجوهرات المخصصة. نسبة معتبرة من العملاء ستحتاج لمنتجات كهدية (أعياد ميلاد، ذكرى سنوية، خطوبة، عيد الحب، يوم الأم). اللغة الأساسية للموقع هي العربية مع دعم كامل للإنجليزية في أسماء المنتجات التقنية.
+٣. المواصفات التقنية (Tech Stack)
+الموقع مبني بالكامل على Next.js 14 مع TypeScript لبناء كود آمن وقابل للصيانة. الواجهة الأمامية تستخدم Tailwind CSS للتصميم السريع والمتسق. قاعدة البيانات PostgreSQL مع Prisma ORM. المصادقة عبر NextAuth.js. الـ State management عبر Zustand. الدفع عند الاستلام فقط (لا حاجة لبوابة دفع إلكترونية في المرحلة الأولى).
+٣.١ التقنيات المستخدمة
+الفئة
+التقنية
+الإصدار
+الغرض
+Frontend Framework
+Next.js
+14.x (App Router)
+إطار العمل الأساسي مع SSR وSEO
+Language
+TypeScript
+5.x
+أمان الأنواع وقابلية الصيانة
+Styling
+Tailwind CSS
+3.x
+تصميم سريع ومتسق
+UI Components
+shadcn/ui + Radix UI
+أحدث إصدار
+مكونات جاهزة قابلة للتخصيص
+Animations
+Framer Motion
+11.x
+أنيميشن سلس ومتقدم
+Database
+PostgreSQL
+15+
+قاعدة بيانات علائقية قوية
+ORM
+Prisma
+5.x
+إدارة قاعدة البيانات بـ TypeScript
+Authentication
+NextAuth.js (Auth.js)
+5.x
+نظام مصادقة كامل
+State Management
+Zustand
+4.x
+إدارة حالة السلة والمستخدم
+Forms
+React Hook Form + Zod
+أحدث
+نماذج آمنة ومتحققة
+Image Optimization
+next/image + Sharp
+—
+تحسين الصور تلقائياً
+Email
+Resend + React Email
+—
+إرسال إيميلات الطلبات والترحيب
+WhatsApp
+WhatsApp Cloud API
+—
+إشعارات الطلبات والدعم
+AI
+OpenAI API / Z.ai SDK
+—
+Chatbot وتوصيات منتجات
+Deployment
+Vercel
+—
+استضافة + CDN + SSL تلقائي
+Analytics
+Vercel Analytics + Meta Pixel
+—
+تتبع الزوار والتحويلات
+٣.٢ البنية المعمارية للمشروع
+المشروع يتبع بنية Monorepo بسيطة مع فصل واضح بين الـ App Router pages (للواجهة الأمامية) و API routes (للـ backend). قاعدة البيانات على Vercel Postgres أو Supabase. التخزين للصور على Vercel Blob أو Cloudflare R2. الـ Admin dashboard يكون جزء من نفس المشروع تحت مسار /admin مع حماية إضافية.
+هيكل المجلدات المقترح:
+◆  app/ (للواجهة الأمامية - App Router)
+◆  app/(shop)/ (صفحات المتجر: home, products, product/[slug], cart, checkout)
+◆  app/(auth)/ (login, register, forgot-password)
+◆  app/(account)/ (profile, orders, wishlist, addresses)
+◆  app/admin/ (لوحة التحكم الإدارية)
+◆  app/api/ (API routes للـ backend)
+◆  components/ (مكونات React قابلة لإعادة الاستخدام)
+◆  lib/ (utilities, prisma client, auth config)
+◆  prisma/ (schema.prisma + migrations)
+◆  public/ (الصور والأيقونات الثابتة)
+◆  types/ (TypeScript types عامة)
+٤. الصفحات الرئيسية للموقع
+الموقع يحتوي على مجموعة صفحات مصممة بعناية لتوفير تجربة تسوق متكاملة. كل صفحة محسّنة لسرعة التحميل (LCP < 2.5s) وSEO (meta tags, structured data, sitemap). التصميم Mobile-first مع دعم كامل للـ Desktop.
+٤.١ الصفحة الرئيسية (Home Page) — /
+الصفحة الرئيسية هي واجهة المتجر وأهم صفحة للانطباع الأول. تحتوي على Hero section بصورة عالية الجودة لمجموعة مجوهرات مع نص ترحيبي وزر CTA رئيسي. أسفلها قسم المنتجات المميزة (Featured) وقسم الأكثر مبيعاً (Best Sellers) وقسم العروض الحالية. ثم قسم About قصير介绍 عن البراند وقسم الشهادات (Testimonials) وفي الآخر Newsletter signup وروابط التواصل الاجتماعي.
+عناصر الصفحة الرئيسية:
+1. Hero Section: صورة فاخرة + عنوان رئيسي + زر تسوق الآن + countdown timer للعروض
+2. Featured Categories: 3-4 فئات (أساور، قلائد، خواتم، عروض) بصور دائرية
+3. Best Sellers: عرض 4-8 منتجات الأكثر مبيعاً مع تقييمات وخصومات
+4. Personalization Highlight: قسم يشرح كيفية تخصيص المنتج بفيديو أو GIF
+5. Testimonials: شهادات عملاء حقيقيين مع اسم وصورة ونجوم تقييم
+6. About Brand: قصة البراند مع صورة المؤسس/المحل
+7. Instagram Feed: عرض آخر منشورات Instagram (via API)
+8. WhatsApp CTA: زر عائم أخضر في كل الصفحات للتواصل المباشر
+9. Newsletter: اشتراك في النشرة البريدية للحصول على خصم 10%
+10. Footer: روابط، سياسات، طرق دفع، وسائل تواصل
+٤.٢ صفحة كل المنتجات (Products Page) — /products
+صفحة تعرض جميع المنتجات في Grid view متجاوب (2 columns على الموبايل، 3-4 على الديسكتوب). تحتوي على Sidebar للفلاتر (الفئة، السعر، المعدن، اللون) وصف排序 للترتيب (الأحدث، الأكثر مبيعاً، السعر تصاعدي/تنازلي). كل منتج في بطاقة (card) تحتوي على صورة، اسم، سعر أصلي ومخفض، نسبة الخصم، تقييم، وزر إضافة سريع للسلة. النقر على المنتج ينقل لصفحة التفاصيل.
+مميزات صفحة المنتجات:
+◆  Grid View متجاوب (2-4 columns حسب حجم الشاشة)
+◆  Sidebar فلاتر: الفئة، السعر (slider)، المعدن، اللون، التقييم، التوفير
+◆  Sort dropdown: الأحدث، الأكثر مبيعاً، السعر تصاعدي، السعر تنازلي، الأعلى تقييماً
+◆  Pagination أو Infinite scroll (يفضل Infinite scroll)
+◆  Quick View: زر لمعاينة سريعة للمنتج في Modal بدون مغادرة الصفحة
+◆  Add to Cart سريع: زر على كل بطاقة منتج لإضافته للسلة مباشرة
+◆  Wishlist: زر قلب على كل بطاقة لإضافة المنتج لقائمة المفضلة
+◆  Discount Badges: شارة حمراء 'خصم 33%' واضحة على كل منتج مخفض
+◆  Breadcrumbs: مسار تنقل واضح (الرئيسية > المنتجات > الفئة)
+◆  Empty State: تصميم لطيف عندما لا توجد نتائج تطابق الفلاتر
+٤.٣ صفحة تفاصيل المنتج (Product Detail) — /products/[slug]
+أهم صفحة في الموقع من ناحية التحويل. تحتوي على معرض صور متعدد للمنتج (4-6 صور) مع zoom on hover وthumbnails للتبديل. القسم الأيمن يحتوي على اسم المنتج، التقييمات، السعر، الوصف، خيارات التخصيص (الاسم الأول، الاسم الثاني، نوع المعدن، الحجم)، الكمية، وزر إضافة للسلة وزر شراء الآن. أسفلها قسم التفاصيل الكاملة، قسم المراجعات، وقسم منتجات ذات صلة.
+عناصر صفحة تفاصيل المنتج:
+1. Image Gallery: صورة رئيسية كبيرة + thumbnails للصور الإضافية + zoom on hover
+2. Product Title: اسم المنتج بخط كبير وبارز
+3. Rating Summary: متوسط التقييم + عدد المراجعات + روابط للمراجعات
+4. Price Block: السعر الحالي (كبير) + السعر الأصلي (مشطوب) + نسبة الخصم (شارة)
+5. Short Description: وصف مختصر 2-3 أسطر
+6. Personalization Form: حقول إدخال الاسم الأول والثاني + اختيار الخط + اختيار المعدن
+7. Live Preview: معاينة حية للنص المدخل على صورة المنتج (يفضل)
+8. Quantity Selector: - / + buttons مع حد أدنى وأعلى
+9. Add to Cart Button: زر كبير أسود مع أيقونة سلة
+10. Buy Now Button: زر ذهبي للانتقال مباشرة لصفحة الدفع
+11. WhatsApp Inquiry: زر أخضر للاستفسار عن المنتج عبر WhatsApp
+12. Trust Badges: ضمان الجودة، شحن مجاني، دفع عند الاستلام، إرجاع خلال 14 يوم
+13. Product Tabs: الوصف | المواصفات | المراجعات | الشحن والإرجاع
+14. Related Products: 4-6 منتجات ذات صلة في نهاية الصفحة
+15. Recently Viewed: قسم المنتجات التي شاهدها المستخدم مؤخراً
+٤.٤ سلة التسوق (Cart) — /cart
+صفحة السلة تعرض كل المنتجات المضافة مع إمكانية تعديل الكمية أو حذف منتج. تحتوي على ملخص الطلب (Subtotal, Shipping, Tax, Total) وحقل لإدخال كوبون خصم. زر 'متابعة الدفع' ينقل لصفحة الـ Checkout. زر 'متابعة التسوق' يعود لصفحة المنتجات. السلة محفوظة في localStorage للزوار وفي قاعدة البيانات للمستخدمين المسجلين.
+٤.٥ صفحة الدفع (Checkout) — /checkout
+صفحة Checkout من صفحة واحدة (Single Page Checkout) مع حقول: الاسم الكامل، رقم الهاتف، المحافظة، المدينة، العنوان بالتفصيل، ملاحظات إضافية. طريقة الدفع الوحيدة هي الدفع عند الاستلام (COD) مع شارة واضحة. زر 'تأكيد الطلب' ينشئ الطلب ويحول المستخدم لصفحة Thank You مع رقم الطلب. يتم إرسال إيميل تأكيد ورسالة WhatsApp للمتجر وللعميل.
+٤.٦ صفحات إضافية
+الصفحة
+المسار
+الوصف
+من نحن
+/about
+قصة البراند، الرؤية، القيم
+اتصل بنا
+/contact
+نموذج تواصل + خريطة + أرقام هواتف
+سياسة الشحن
+/shipping-policy
+تفاصيل الشحن والمدد والتكاليف
+سياسة الإرجاع
+/return-policy
+شروط وأحكام الإرجاع والاستبدال
+الأسئلة الشائعة
+/faq
+أسئلة وأجوبة منظمة في accordion
+تتبع الطلب
+/track-order
+إدخال رقم الطلب لعرض حالته
+دليل المقاسات
+/size-guide
+جدول مقاسات الأساور والقلائد
+العناوين
+/account/addresses
+إدارة عناوين الشحن المحفوظة
+٥. المميزات الأساسية (Core Features)
+٥.١ نظام تخصيص المنتج (Product Personalization)
+الميزة الأهم في الموقع — العميل يستطيع تخصيص المنتج بإدخال نصوص (اسم، تاريخ، رسالة) واختيار الخط والمعدن والحجم. التخصيص ينعكس على السعر (إذا كان هناك تكلفة إضافية للحروف الإضافية أو خط خاص) ويتم حفظه مع الطلب. يفضل وجود Live Preview يعرض النص على شكل المنتج بشكل فوري.
+خيارات التخصيص:
+◆  الاسم الأول (نص حر، حد أقصى 15 حرف)
+◆  الاسم الثاني (نص حر اختياري، حد أقصى 15 حرف)
+◆  نوع الخط: 4-5 خطوط متاحة (عربي تقليدي، عربي حديث، إنجليزي، رموز)
+◆  نوع المعدن: فضة 925، ذهب عيار 18، ذهب عيار 21، روديوم
+◆  حجم الأساور: 16 سم، 17 سم، 18 سم، 19 سم، 20 سم
+◆  حجم الخواتم: من 10 إلى 25 (دليل مقاسات)
+◆  علبة هدية فاخرة: نعم/لا (+50 ج.م)
+◆  بطاقة إهداء: نص رسالة مخصص (+20 ج.م)
+٥.٢ السلة وتجربة التسوق
+السلة تستخدم Zustand للـ state management مع persisting في localStorage للزوار وفي قاعدة البيانات للمسجلين. عند تسجيل الدخول، تدمج السلة المحلية مع سلة الحساب. زر السلة في الـ Header يعرض عدد المنتجات (badge) وعند النقر يفتح Drawer جانبي بملخص سريع للسلة مع زر للانتقال لصفحة السلة الكاملة.
+٥.٣ نظام الكوبونات والخصومات
+نظام كوبونات مرن يدعم: نسبة مئوية (10%)، مبلغ ثابت (50 ج.م)، شحن مجاني، خصم على فئة معينة. الكوبون له تاريخ بداية ونهاية، حد أدنى للطلب، حد أقصى للاستخدام، حد استخدام لكل عميل. يمكن إنشاء كوبونات من Admin dashboard. الكوبونات تظهر بشكل واضح في صفحة السلة والـ Checkout.
+أنواع الكوبونات المدعومة:
+◆  نسبة مئوية: خصم 10% على إجمالي الطلب
+◆  مبلغ ثابت: خصم 50 ج.م على الطلبات فوق 500 ج.م
+◆  شحن مجاني: شحن مجاني للطلبات فوق مبلغ معين
+◆  Buy One Get One: اشترِ واحد واحصل على الثاني بخصم 50%
+◆  كوبونات تلقائية: تطبق على كل المنتجات في فترة العروض
+◆  كوبونات شخصية: مرتبطة بعميل معين (للعملاء المميزين)
+٥.٤ نظام التقييمات والمراجعات
+العملاء المسجلون الذين اشتروا المنتج يستطيعون ترك تقييم (1-5 نجوم) ومراجعة نصية وصور. المراجعات تحتاج موافقة Admin قبل النشر. التقييمات تظهر في صفحة المنتج مع متوسط التقييم وتوزيع النجوم. التقييمات تؤثر على ترتيب المنتج في صفحة 'الأعلى تقييماً'.
+٦. المميزات المتقدمة (Advanced Features)
+٦.١ نظام العضويات (User Accounts)
+العملاء يستطيعون إنشاء حساب عبر البريد الإلكتروني وكلمة المرور، أو الدخول السريع عبر Google أو Facebook (OAuth). الحساب يتيح: تتبع الطلبات، إدارة العناوين، قائمة المفضلة (Wishlist)، سجل الطلبات السابقة، إعادة الطلب بضغطة، نقاط الولاء (Loyalty Points)، وإعدادات الإشعارات.
+مميزات حساب العميل:
+◆  تسجيل دخول بالبريد + كلمة مرور
+◆  تسجيل دخول سريع بـ Google / Facebook OAuth
+◆  ملف شخصي: الاسم، الصورة، رقم الهاتف، تاريخ الميلاد
+◆  عناوين متعددة محفوظة (Home, Work, Other)
+◆  قائمة المفضلة (Wishlist) — إضافة وحذف ونقل للسلة
+◆  سجل الطلبات مع تفاصيل كاملة وحالة كل طلب
+◆  إعادة الطلب: زر لإعادة طلب بنفس المنتجات والتخصيصات
+◆  نقاط الولاء: 1 نقطة لكل 10 ج.م، تستبدل بخصومات
+◆  إعدادات الإشعارات: إيميل، SMS، WhatsApp
+◆  حذف الحساب: مع تأكيد وإمكانية تصدير البيانات
+٦.٢ لوحة التحكم الإدارية (Admin Dashboard)
+لوحة تحكم كاملة تحت مسار /admin محمية بمصادقة إضافية (Admin role). تتضمن: Dashboard رئيسي بإحصائيات (مبيعات اليوم/الشهر، عدد الطلبات، متوسط قيمة الطلب، المنتجات الأكثر مبيعاً)، إدارة المنتجات (CRUD كامل)، إدارة الطلبات (تحديث الحالة، طباعة الفاتورة)، إدارة العملاء، إدارة الكوبونات، إدارة المراجعات، التقارير والتحليلات.
+أقسام لوحة التحكم:
+1. Dashboard: KPIs, رسوم بيانية للمبيعات، آخر الطلبات، تنبيهات
+2. Products: إضافة/تعديل/حذف المنتجات، الصور، الفئات، التخصيصات، الأسعار
+3. Orders: قائمة الطلبات، تحديث الحالة (Pending, Confirmed, Shipped, Delivered, Cancelled)، طباعة فاتورة، إرسال WhatsApp للعميل
+4. Customers: قائمة العملاء، تفاصيل، سجل الطلبات، نقاط الولاء
+5. Categories: إدارة الفئات والفئات الفرعية
+6. Coupons: إنشاء/تعديل/حذف الكوبونات، إحصائيات الاستخدام
+7. Reviews: مراجعة وموافقة/رفض المراجعات
+8. Banners: إدارة البانرات والعروض في الصفحة الرئيسية
+9. Reports: تقارير المبيعات، المنتجات الأكثر/الأقل مبيعاً، العملاء المميزين
+10. Settings: إعدادات المتجر (الاسم، اللوجو، العملة، الضرائب، الشحن، الأيميلات)
+٦.٣ تكامل WhatsApp Business
+تكامل كامل مع WhatsApp Cloud API (الرسمي من Meta) لإرسال رسائل أوتوماتيكية للعملاء في عدة مواقف: تأكيد الطلب، شحن الطلب، توصيل الطلب، تذكير بسلة مهجورة، كوبونات شخصية. كذلك زر WhatsApp عائم في كل صفحات الموقع للتواصل المباشر مع خدمة العملاء، يفتح محادثة مباشرة مع رقم المتجر ويرسل معلومات المنتج تلقائياً.
+سيناريوهات إرسال WhatsApp:
+◆  تأكيد الطلب: رسالة فورية بعد إتمام الطلب مع تفاصيله
+◆  تحديث حالة الطلب: شحن، تخزيم، توصيل
+◆  تذكير السلة المهجورة: بعد 1 ساعة و24 ساعة من مغادرة السلة بدون إتمام
+◆  كوبون عيد الميلاد: رسالة تلقائية في عيد ميلاد العميل
+◆  طلب مراجعة: بعد 7 أيام من التوصيل لطلب مراجعة على المنتج
+◆  دعم فوري: رد على استفسارات العملاء المرسلة من زر WhatsApp العائم
+٦.٤ مميزات الذكاء الاصطناعي (AI Features)
+استخدام الذكاء الاصطناعي لتعزيز تجربة المستخدم وزيادة المبيعات. يتم عبر API خارجي (OpenAI أو Z.ai SDK) لتقليل التكلفة. المميزات تشمل: chatbot للدعم الفوري، توصيات منتجات ذكية، بحث دلالي، توليد أوصاف المنتجات تلقائياً، وتحليل المشاعر في المراجعات.
+مميزات AI المطلوبة:
+1. AI Chatbot: دردشة في الزاوية السفلية، يجيب على الأسئلة الشائعة، يقترح منتجات، يحول لإنسان عند الحاجة
+2. Smart Recommendations: 'منتجات قد تعجبك' بناءً على سلوك التصفح والطلبات السابقة
+3. Semantic Search: بحث ذكي يفهم المرادفات (مثلاً 'هدية خطوبة' يعرض القلائد)
+4. AI Product Descriptions: لوحة التحكم تستخدم AI لتوليد وصف المنتج من المواصفات
+5. Visual Search (ميزة متقدمة): العميل يرفع صورة وAI يجد منتجات مشابهة
+6. Sentiment Analysis: تحليل مشاعر المراجعات لعرض الأكثر إيجابية
+7. Price Optimization: اقتراح أسعار مثلى بناءً على الطلب والمنافسة
+8. Fraud Detection: كشف الطلبات المشبوهة (عنوان غير مطابق، طلبات متكررة)
+٧. التصميم والهوية البصرية (Design & Branding)
+التصميم بيعكس هوية البراند الفاخرة GLIMOKA — لون أساسي خمري (Burgundy) مستوحى من اللوجو، مع لون كريمي ناعم كخلفية، ولمسات ذهبية وردية (Rose Gold) للمميزات والحدود. الأبيض بيستخدم للنصوص على الخلفيات الداكنة. التصميم minimalist luxury مع لمسة دفء ونعومة من الخمري. الخطوط أنيقة وحديثة (sans-serif). الصور عالية الجودة بإضاءة احترافية على خلفيات كريمي. الأنيميشن سلس وغير مبالغ فيه. الهدف: شعور الفخامة والدفء والأناقة المعاصرة.
+٧.١ لوحة الألوان (Color Palette) — GLIMOKA Brand
+اللوحة مستوحاة مباشرة من لوجو GLIMOKA. اللون الخمري (Burgundy) هو الـ primary وبيستخدم في الهيدر والفوتر والأزرار الرئيسية. اللون الكريمي هو الخلفية الأساسية للصفحات وبيدي إحساس بالدفء والفخامة. الـ Rose Gold بيستخدم للمميزات والحدود والتفاصيل الفاخرة.
+اللون
+الكود (HEX)
+الاستخدام
+خمري فاخر (Burgundy)
+#6A1B35
+اللون الرئيسي للبراند، الهيدر، الفوتر، الأزرار الأساسية
+خمري غامق
+#4A1124
+خلفيات البطاقات الداكنة، الـ hover states
+خمري فاتح
+#8B3A4F
+الحدود، الروابط، الـ secondary buttons
+ذهبي وردي (Rose Gold)
+#C9A87C
+اللون المميز، الأيقونات، تفاصيل فاخرة
+كريمي ناعم
+#FAF6F2
+الخلفية الأساسية للصفحات
+كريمي داكن
+#F5EDE6
+خلفيات البطاقات، الـ alternating rows
+أبيض ناصع
+#FFFFFF
+النصوص على الخلفيات الداكنة، البطاقات
+رمادي دافئ
+#6B5560
+النصوص الثانوية، الـ placeholders
+أسود دافئ
+#2D1A1F
+النصوص الأساسية على الخلفيات الفاتحة
+أخضر زمردي
+#10B981
+رسائل النجاح، زر WhatsApp
+أحمر طوبي
+#9B2C2C
+شارات الخصم، رسائل الخطأ
+٧.٢ الخطوط (Typography)
+استخدام خط Cairo أو Tajawal للنصوص العربية (مجانية من Google Fonts، تدعم RTL بشكل ممتاز). للنصوص الإنجليزية استخدام Inter أو Poppins (يتماشى مع الـ sans-serif الحديث بتاع لوجو GLIMOKA). العناوين بخط أكبر ووزن أثقل (Bold أو Black). النصوص العادية بوزن Regular. الحفاظ على تباين كافٍ (contrast ratio ≥ 4.5:1) للنصوص على الخلفيات. اسم البراند GLIMOKA يفضل يظهر بخط خاص أو capital letters مع letter-spacing عشان يطابق اللوجو.
+العنصر
+الخط
+الحجم
+الوزن
+H1 (عناوين الصفحات)
+Cairo
+32-40 px
+Bold (700)
+H2 (عناوين الأقسام)
+Cairo
+24-28 px
+Semi-Bold (600)
+H3 (عناوين فرعية)
+Cairo
+20-22 px
+Semi-Bold (600)
+Body Text
+Cairo / Tajawal
+16-18 px
+Regular (400)
+Small / Captions
+Cairo
+13-14 px
+Regular (400)
+Buttons / CTAs
+Cairo
+16 px
+Semi-Bold (600)
+Product Price
+Cairo
+20-24 px
+Bold (700)
+English / Numbers
+Inter / Poppins
+—
+—
+٧.٣ المكونات والعناصر البصرية
+◆  أزرار بزوايا دائرية ناعمة (border-radius: 8-12px)
+◆  الأزرار الأساسية باللون الخمري #6A1B35 مع نص أبيض
+◆  الأزرار الثانوية باللون الكريمي مع حدود خمرية
+◆  بطاقات بظلال خفيفة (subtle shadows) وحدود رفيعة بلون الـ rose gold
+◆  Hover effects سلسة على كل العناصر القابلة للنقر (transition 200ms)
+◆  Loading skeletons بدلاً من spinners (لتجربة أفضل)
+◆  Icons من Lucide أو Heroicons (مجانية وأنيقة)
+◆  Toast notifications للإجراءات (إضافة للسلة، تسجيل الدخول، إلخ)
+◆  Modals و Dialogs بـ backdrop blur للتركيز
+◆  Mobile drawer للقائمة الجانبية بدلاً من hamburger menu
+◆  اسم البراند GLIMOKA يظهر في الهيدر بنفس ستايل اللوجو (capital letters, letter-spacing)
+◆  صور المنتجات على خلفية كريمية ناعمة مع إضاءة احترافية تبرز لمعان المجوهرات
+٧.٤ الاستجابة للشاشات (Responsive Design)
+التصميم Mobile-first حيث أكثر من 80% من الزيارات من الموبايل. Breakpoints القياسية: Mobile (< 768px), Tablet (768-1024px), Desktop (> 1024px). قائمة الموبايل Drawer جانبي، المنتجات 2 columns على الموبايل و 3-4 على الديسكتوب. الفلاتر تصبح Modal على الموبايل. الـ Checkout يصبح خطوة بخطوة (Stepper) على الموبايل.
+٨. نظام الدفع والشحن
+في المرحلة الأولى، الموقع يدعم الدفع عند الاستلام (COD) فقط. هذا مناسب جداً للسوق المصري ويبني الثقة مع العملاء. يمكن إضافة بوابات دفع إلكتروني (Paymob, Fawry) في مرحلة لاحقة. تكلفة الشحن ثابتة (مثلاً 50 ج.م) أو مجانية للطلبات فوق 1000 ج.م. الشحن لكل المحافظات المصرية مع مدة توصيل من 2-5 أيام عمل.
+٨.١ تكاليف الشحن
+المنطقة
+التكلفة (ج.م)
+مدة التوصيل
+القاهرة الكبرى (القاهرة، الجيزة، 6 أكتوبر، الشيخ زايد)
+30
+2-3 أيام
+المدن الكبرى (الإسكندرية، المنصورة، طنطا، أسيوط)
+40
+3-4 أيام
+باقي المحافظات
+50
+4-5 أيام
+شحن مجاني
+0
+—
+شحن مجاني للطلبات فوق 1000 ج.م. يمكن تطبيق كوبون شحن مجاني. عند الـ Checkout، يختار العميل المحافظة ويتم حساب تكلفة الشحن تلقائياً.
+٨.٢ حالات الطلب (Order Status)
+◆  Pending: الطلب تم استلامه ولم يتم التأكيد بعد
+◆  Confirmed: تم تأكيد الطلب والبدء في تحضيره
+◆  Customizing: المنتج في مرحلة التخصيص (للمنتجات المخصصة)
+◆  Shipped: تم تسليم الطلب لشركة الشحن
+◆  Out for Delivery: الطلب في طريقه للعميل
+◆  Delivered: تم التوصيل واستلام العميل
+◆  Cancelled: تم إلغاء الطلب
+◆  Returned: تم إرجاع الطلب
+٩. الأمان والأداء (Security & Performance)
+٩.١ الأمان
+◆  HTTPS إجباري عبر Vercel SSL
+◆  تشفير كلمات المرور بـ bcrypt
+◆  حماية CSRF في كل النماذج
+◆  Rate limiting على API endpoints (خاصة login و register)
+◆  Sanitization لكل المدخلات لمنع XSS وSQL injection
+◆  CORS محدود على APIs المعروفة فقط
+◆  Admin dashboard محمي بـ role-based access control
+◆  Two-Factor Authentication للـ Admin (اختياري)
+◆  نسخ احتياطي يومي لقاعدة البيانات
+◆  Compliance مع GDPR و Egyptian Personal Data Protection Law
+٩.٢ الأداء
+◆  LCP < 2.5s على Mobile 4G
+◆  FID < 100ms
+◆  CLS < 0.1
+◆  Page Size < 500KB (gzipped)
+◆  Image optimization عبر next/image (WebP, AVIF)
+◆  Lazy loading للصور والمكونات
+◆  Code splitting تلقائي عبر Next.js
+◆  Edge caching للصفحات الثابتة
+◆  Database indexing على الحقول الحرجة
+◆  Lighthouse score > 90 في كل الأقسام
+١٠. خطة التنفيذ والمراحل
+المشروع منقسم إلى 4 مراحل رئيسية بمدة إجمالية تقريبية 8-12 أسبوع. كل مرحلة تنتهي بميلستون قابل للتسليم. يمكن تقليل المدة عبر الاستعانة بـ AI code assistants (Cursor, Claude) في كتابة الكود.
+المرحلة
+المدة
+المخرجات
+المرحلة 1: Setup + Core Pages
+2-3 أسابيع
+تثبيت المشروع، قاعدة البيانات، الصفحات الرئيسية، صفحة المنتجات، صفحة تفاصيل المنتج
+المرحلة 2: E-commerce Flow
+2-3 أسابيع
+السلة، الـ Checkout، نظام الطلبات، إدارة المنتجات (Admin)
+المرحلة 3: User Accounts + Advanced
+2-3 أسابيع
+نظام العضويات، الكوبونات، المراجعات، تكامل WhatsApp
+المرحلة 4: AI + Polish + Launch
+2-3 أسابيع
+AI features، اختبارات، تحسين الأداء، الإطلاق
+١٠.١ متطلبات ما قبل الإطلاق (Pre-launch)
+◆  اختبار شامل على متصفحات متعددة (Chrome, Safari, Firefox, Edge)
+◆  اختبار على أجهزة مختلفة (iPhone, Android, iPad, Desktop)
+◆  SEO audit كامل (meta tags, sitemap, robots.txt, structured data)
+◆  Performance optimization (Lighthouse > 90)
+◆  Security audit و penetration testing أساسي
+◆  إعداد Google Analytics و Meta Pixel
+◆  إعداد Google Search Console
+◆  ربط WhatsApp Business API
+◆  إعداد Resend لإرسال الإيميلات
+◆  اختبار كامل لعملية الشراء من البداية للنهاية
+١١. المتطلبات من العميل
+للبدء في التنفيذ، نحتاج من العميل توفير المعلومات والمواد التالية:
+١١.١ المحتوى
+◆  اسم البراند و logo بصيغة عالية الجودة (SVG أو PNG transparent)
+◆  قائمة المنتجات الأولية (10-30 منتج) مع: اسم، وصف، صور (3-5 لكل منتج)، سعر، خصم، فئة
+◆  سياسات المتجر (شحن، إرجاع، خصوصية، شروط الاستخدام)
+◆  قائمة الأسئلة الشائعة
+◆  معلومات About (قصة البراند، الرؤية، القيم، صورة المؤسس)
+◆  شهادات عملاء (إن وجدت)
+١١.٢ الحسابات التقنية
+◆  Domain name (مثلاً mybrand.eg أو mybrand.com)
+◆  Vercel account للاستضافة
+◆  Database account (Vercel Postgres أو Supabase)
+◆  WhatsApp Business API account (من Meta)
+◆  Resend account للإيميلات
+◆  OpenAI أو Z.ai API key للمميزات الذكية
+◆  Google Analytics 4 + Meta Pixel
+١٢. Prompt الجاهز للذكاء الاصطناعي
+الـ Prompt التالي جاهز للنسخ المباشر إلى أي أداة ذكاء اصطناعي (Cursor, Claude, ChatGPT, v0, Lovable, Bolt.new) لبناء الموقع خطوة بخطوة. يفضل تقسيمه على عدة messages إذا كان الذكاء الاصطناعي يحتاج لخطوات تفصيلية أكثر.
+# Project: GLIMOKA — Luxury Jewelry E-Commerce Store (Egypt)
+Build a complete, production-ready e-commerce website for personalized jewelry
+(bracelets, necklaces, rings with custom names) targeting Egyptian customers.
+Brand name: GLIMOKA (use this exact name in header, footer, emails, metadata).
+Language: Arabic (RTL primary) + English support.
+Currency: EGP (Egyptian Pounds) only.
+Payment: Cash on Delivery (COD) only — NO payment gateway integration.
+## Tech Stack (Mandatory)
+- Next.js 14 (App Router) + TypeScript
+- Tailwind CSS 3 + shadcn/ui + Radix UI
+- PostgreSQL + Prisma ORM 5
+- NextAuth.js (Auth.js) 5 with Google + Facebook OAuth
+- Zustand (state) + React Hook Form + Zod (forms)
+- Framer Motion (animations)
+- next/image for image optimization
+- Resend + React Email (transactional emails)
+- WhatsApp Cloud API (order notifications + floating button)
+- OpenAI API or Z.ai SDK (AI chatbot + recommendations)
+- Vercel for deployment
+## Design — GLIMOKA Brand Identity (Burgundy + Cream + Rose Gold)
+The design MUST match the GLIMOKA brand logo: deep burgundy background,
+white text, subtle swirls, modern minimalist luxury.
+Color palette (use these exact HEX codes in Tailwind config):
+- burgundy:      #6A1B35  (PRIMARY — header, footer, primary buttons, hero overlay)
+- burgundyDeep:  #4A1124  (hover states, dark card backgrounds)
+- burgundyLight: #8B3A4F  (borders, links, secondary buttons)
+- roseGold:      #C9A87C  (ACCENT — icons, dividers, premium details, brand name)
+- cream:         #FAF6F2  (main page background — warm, luxurious)
+- creamDark:     #F5EDE6  (alternating rows, card backgrounds)
+- white:         #FFFFFF  (text on dark, cards)
+- warmGray:      #6B5560  (secondary text, placeholders)
+- warmBlack:     #2D1A1F  (body text on light backgrounds — warm tinted black)
+- success:       #10B981  (success messages, WhatsApp button)
+- danger:        #9B2C2C  (discount badges, error messages)
+Typography:
+- Arabic: Cairo (Google Fonts) for body and headings
+- English/Latin: Inter or Poppins (sans-serif, matches GLIMOKA logo style)
+- Brand name 'GLIMOKA' in header: uppercase, letter-spacing: 0.15em,
+  font-weight: 600, color: roseGold on dark OR burgundy on light
+- H1: 32-40px, Bold (700)
+- H2: 24-28px, Semi-Bold (600)
+- Body: 16-18px, Regular (400)
+Visual style:
+- Border-radius: 8-12px on buttons and cards (soft, luxurious)
+- Subtle shadows (shadow-sm to shadow-md), never harsh
+- Smooth hover effects: transition-all duration-200, scale on hover for cards
+- Buttons: rounded-lg, burgundy bg + white text for primary
+- Cards: white or creamDark bg, 1px roseGold/30 border, hover:shadow-lg
+- Product images on cream background (#FAF6F2) for brand consistency
+- Mobile-first responsive (2-col mobile, 3-4 col desktop grids)
+- RTL layout throughout (dir="rtl", lang="ar")
+- Favicon and OG image should use the GLIMOKA logo
+## Pages to Build
+### 1. Home Page (/)
+- Header: GLIMOKA brand name (roseGold, uppercase, letter-spaced) + nav + cart icon
+- Hero section: burgundy background with luxury jewelry image + white headline +
+  roseGold CTA button 'تسوق الآن'
+- Featured categories (4 circular cards: Bracelets, Necklaces, Rings, Offers) on cream bg
+- Best Sellers section (4-8 product cards with ratings + discount badges)
+- Personalization showcase (GIF/video showing name customization on product)
+- Testimonials carousel (3-5 customer reviews with photos + 5-star ratings)
+- About GLIMOKA snippet (1 paragraph + brand story image)
+- Instagram feed grid (latest 6-9 posts)
+- Newsletter signup with 10% discount offer (burgundy CTA)
+- Floating WhatsApp button (bottom-right, green #10B981, always visible)
+- Footer: burgundy background, white text, links, payment icons, social media
+### 2. Products Listing (/products)
+- Grid layout (2 cols mobile, 3-4 cols desktop) on cream background
+- Sidebar filters: Category, Price (slider), Metal, Color, Rating, Discount
+- Sort dropdown: Newest, Best Selling, Price Low-High, Price High-Low, Top Rated
+- Infinite scroll OR load more button
+- Product card: image (on cream bg), name, original price (strikethrough),
+  discounted price (burgundy bold), discount badge (danger bg, white text),
+  star rating (roseGold stars), quick add to cart (burgundy btn), wishlist heart
+- Breadcrumbs: Home > Products > [Category]
+- Mobile: filters become a slide-out modal triggered by 'Filters' button
+### 3. Product Detail (/products/[slug])
+- Image gallery: 1 large image + 4-6 thumbnails below, zoom on hover
+- Title (large bold warmBlack), rating summary (roseGold stars + count + link)
+- Price block: discounted price (large burgundy bold), original price (strikethrough),
+  discount badge (danger bg)
+- Short description (2-3 lines)
+- PERSONALIZATION FORM (key feature — bordered with roseGold accent):
+  - First name input (max 15 chars, Arabic + English)
+  - Second name input (max 15 chars, optional)
+  - Font selector (4-5 Arabic/English fonts)
+  - Metal selector (Silver 925, Gold 18k, Gold 21k, Rhodium)
+  - Size selector (16-20cm for bracelets, 10-25 for rings)
+  - Gift box checkbox (+50 EGP)
+  - Gift card message input (+20 EGP)
+- LIVE PREVIEW: shows typed text on product image (use canvas or SVG overlay)
+- Quantity selector (- / + buttons, min 1, max 10)
+- Add to Cart button (burgundy bg, white text, large, full width on mobile)
+- Buy Now button (roseGold bg, white text, full width on mobile)
+- WhatsApp Inquiry button (green #10B981) with pre-filled message
+- Trust badges: Quality Guarantee, Free Shipping, COD, 14-day Returns
+- Tabs: Description | Specifications | Reviews | Shipping & Returns
+- Related products (4-6 cards)
+- Recently viewed products
+### 4. Cart (/cart)
+- Line items: image, name, customization details, price, qty selector, remove button
+- Order summary card (creamDark bg, roseGold border): Subtotal, Shipping, Discount, Total
+- Coupon input field + 'Apply' button (burgundy outline)
+- 'Continue to Checkout' button (burgundy bg, white text, large)
+- 'Continue Shopping' link (burgundyLight)
+- Empty cart state with CTA to products page
+- Cart drawer (slide-in from right) when clicking cart icon in header
+### 5. Checkout (/checkout) — Single Page
+- Contact info: Full name, Phone (Egyptian format +20), Email
+- Shipping address: Governorate (dropdown), City, Detailed address, Notes
+- Order summary sidebar (sticky on desktop, creamDark bg)
+- Payment method: COD only (clearly labeled with icon, burgundy border)
+- 'Place Order' button (burgundy bg, white text, large, full width)
+- On success: redirect to /thank-you with order number + WhatsApp confirmation
+### 6. User Account (/account/*)
+- Profile: name, email, phone, birthday, avatar
+- Addresses: CRUD for multiple shipping addresses (Home, Work, Other)
+- Orders: list with status badges, click to view details + track
+- Wishlist: saved products with 'Move to cart' button
+- Loyalty points: balance + history + redemption options
+- Settings: notification preferences (email, SMS, WhatsApp)
+### 7. Admin Dashboard (/admin) — Protected by Admin role
+- Dashboard: KPIs (today/month sales, order count, AOV, top products),
+  sales chart (last 30 days), recent orders table, low stock alerts
+- Products: full CRUD with image upload, variants, customizations, pricing
+- Orders: list with filters (status, date, customer), update status,
+  print invoice, send WhatsApp to customer
+- Customers: list with details, order history, loyalty points, segment tags
+- Categories: CRUD with image upload
+- Coupons: create/edit/delete with all rules (percent/fixed/free shipping,
+  BOGO, min/max, usage limits, date range, per-customer limit)
+- Reviews: moderate (approve/reject) with bulk actions
+- Banners: manage home page banners and promotions
+- Reports: sales by period, top products, top customers, conversion funnel
+- Settings: store name, logo, currency, tax, shipping rules, email templates
+## Database Schema (Prisma)
+Models: User, Account, Session, Address, Category, Product, ProductImage,
+ProductVariant, Customization, Order, OrderItem, Coupon, CouponUsage,
+Review, Wishlist, LoyaltyPoint, Notification, Banner, AuditLog.
+Use enums: OrderStatus (PENDING, CONFIRMED, CUSTOMIZING, SHIPPED,
+OUT_FOR_DELIVERY, DELIVERED, CANCELLED, RETURNED), UserRole (CUSTOMER, ADMIN).
+## Order Status Flow
+PENDING → CONFIRMED → CUSTOMIZING (if personalized) → SHIPPED →
+OUT_FOR_DELIVERY → DELIVERED
+Any status can transition to CANCELLED or RETURNED with reason logging.
+## Shipping Cost Logic
+- Cairo/Giza/6 October/Sheikh Zayed: 30 EGP (2-3 days)
+- Major cities (Alex, Mansoura, Tanta, Asyut): 40 EGP (3-4 days)
+- Other governorates: 50 EGP (4-5 days)
+- Free shipping on orders > 1000 EGP
+- Coupon can override shipping cost
+## WhatsApp Integration
+- Floating button on all pages (bottom-right, green, opens chat with store number)
+- Auto-send messages via WhatsApp Cloud API on:
+  * Order confirmation (with order details + total + address)
+  * Order status updates (shipped, out for delivery, delivered)
+  * Abandoned cart reminder (1 hour + 24 hours after leaving cart)
+  * Birthday coupon (auto on customer's birthday)
+  * Review request (7 days after delivery)
+- Pre-fill WhatsApp message when customer clicks 'Inquire about this product'
+## AI Features (using OpenAI or Z.ai SDK)
+- Chatbot widget (bottom-left): answers FAQs, recommends products,
+  routes to human support when needed
+- Smart recommendations: 'You may also like' section based on browsing +
+  purchase history (collaborative filtering or LLM-based)
+- Semantic search: understands 'engagement gift' → shows necklaces
+- Admin: AI-generated product descriptions from specifications
+- Optional: Visual search (upload image → find similar products)
+- Optional: Sentiment analysis on reviews for sorting
+## Performance Requirements
+- LCP < 2.5s on 4G mobile
+- FID < 100ms
+- CLS < 0.1
+- Lighthouse score > 90 (Performance, Accessibility, Best Practices, SEO)
+- Image optimization via next/image (WebP/AVIF, lazy load)
+- Code splitting via Next.js App Router
+- Edge caching for static pages
+- Database indexes on slug, categoryId, status, createdAt
+## Security Requirements
+- HTTPS only (Vercel SSL)
+- bcrypt password hashing
+- CSRF protection on all forms
+- Rate limiting: 5 login attempts per minute, 3 register per hour
+- Input sanitization (prevent XSS + SQL injection)
+- CORS restricted to known origins
+- Admin role-based access control (RBAC)
+- Optional 2FA for admin
+- Daily database backups
+- GDPR + Egyptian PDPL compliance
+## File Structure
+app/
+  (shop)/ {page, layout}  → home, /products, /products/[slug], /cart, /checkout
+  (auth)/ {login, register, forgot-password, reset-password}
+  (account)/ {profile, orders, wishlist, addresses, settings}
+  admin/ {dashboard, products, orders, customers, coupons, reviews, settings}
+  api/ {auth, products, cart, orders, webhooks/*, ai/*}
+components/ {ui, shop, admin, layout}
+lib/ {prisma, auth, whatsapp, ai, email, utils}
+prisma/ {schema.prisma, migrations, seed.ts}
+public/ {images, icons, fonts}
+types/ {index.d.ts}
+## Deliverables
+1. Complete Next.js project with all pages functional
+2. Prisma schema + migrations + seed data (10-15 sample products)
+3. Admin dashboard fully functional
+4. WhatsApp integration working (test mode acceptable)
+5. AI chatbot deployed
+6. Deploy on Vercel with proper env vars
+7. Documentation: README with setup steps + env vars list
+8. Lighthouse report > 90 on all metrics
+## Tailwind Config (paste this into tailwind.config.ts)
+----------------------------------------
+import type { Config } from 'tailwindcss';
+export default {
+  theme: {
+    extend: {
+      colors: {
+        burgundy:      '#6A1B35',
+        burgundyDeep:  '#4A1124',
+        burgundyLight: '#8B3A4F',
+        roseGold:      '#C9A87C',
+        cream:         '#FAF6F2',
+        creamDark:     '#F5EDE6',
+        warmGray:      '#6B5560',
+        warmBlack:     '#2D1A1F',
+      },
+      fontFamily: {
+        sans: ['Cairo', 'Inter', 'sans-serif'],
+        brand: ['Inter', 'sans-serif'],
+      },
+      backgroundImage: {
+        'burgundy-gradient': 'linear-gradient(135deg, #6A1B35 0%, #4A1124 100%)',
+        'rose-gold-gradient': 'linear-gradient(135deg, #C9A87C 0%, #8B3A4F 100%)',
+      },
+      boxShadow: {
+        'luxury': '0 4px 20px -2px rgba(106, 27, 53, 0.15)',
+        'luxury-lg': '0 10px 40px -4px rgba(106, 27, 53, 0.20)',
+      },
+    },
+  },
+} satisfies Config;
+----------------------------------------
+## Key Components Setup
+- <BrandLogo />: shows 'GLIMOKA' text in uppercase, letter-spacing: 0.15em,
+  color: roseGold (on dark) or burgundy (on light), font-weight: 600
+- <Button variant="primary">: bg-burgundy text-white hover:bg-burgundyDeep
+- <Button variant="accent">: bg-roseGold text-white hover:bg-burgundyLight
+- <Button variant="outline">: border-2 border-burgundy text-burgundy hover:bg-burgundy hover:text-white
+- <Card>: bg-white border border-roseGold/30 rounded-xl shadow-luxury hover:shadow-luxury-lg
+- <ProductCard>: creamDark bg, roseGold borders, burgundy prices, danger discount badge
+## Implementation Notes
+- Start with database schema, then auth, then shop pages, then admin,
+  then integrations (WhatsApp, AI), then polish + performance.
+- Use shadcn/ui CLI to add components: button, card, input, dialog,
+  dropdown-menu, sheet, toast, badge, table, tabs, etc.
+- Override shadcn primary color with burgundy #6A1B35 in globals.css.
+- Use Next.js 14 Server Components by default, Client Components only
+  when needed (forms, interactivity).
+- Use React Server Actions for mutations where possible.
+- Cache product data with revalidateTag / revalidatePath.
+- Use suspense boundaries for async data loading.
+- Test on mobile first — 80% of Egyptian e-commerce traffic is mobile.
+- All product images should be on cream (#FAF6F2) backgrounds for brand consistency.
+- Use Framer Motion for subtle entrance animations (fade-up, scale on hover).
+Build this step by step. Start by scaffolding the Next.js project,
+setting up Prisma + PostgreSQL, configuring NextAuth, then build
+the home page first as a visual milestone. Confirm before proceeding
+to each subsequent major section.
+١٣. خاتمة وخطوات تالية
+هذه الوثيقة توفر مواصفات تفصيلية كاملة لمتجر المجوهرات الإلكتروني الفاخر. الـ Prompt الجاهز في القسم السابق يمكن نسخه مباشرة إلى أي أداة ذكاء اصطناعي للبدء في التنفيذ. يفضل تقسيم العمل على مراحل والتأكد من كل مرحلة قبل الانتقال للتالية.
+للحصول على أفضل النتائج مع الذكاء الاصطناعي: استخدم Cursor أو Claude 3.5 Sonnet لكتابة الكود، v0.dev لتوليد مكونات UI، Bolt.new أو Lovable للنماذج الأولية السريعة. ابدأ بـ MVP يحتوي على الصفحات الأساسية والمتجر، ثم أضف المميزات المتقدمة تدريجياً.
+في حال وجود أي استفسارات أو تعديلات مطلوبة على المواصفات، يمكن مناقشتها قبل بدء التنفيذ لتجنب إعادة العمل. نتمنى توفيق في المشروع!
