@@ -117,6 +117,9 @@ interface ShopState {
   cartLastUpdated: number | null; // timestamp
   cartReminderDismissed: boolean;
 
+  // Search history
+  recentSearches: string[]; // last 5 searches
+
   // Actions
   setView: (view: ViewName, opts?: { slug?: string; category?: string }) => void;
   openProduct: (slug: string) => void;
@@ -161,6 +164,8 @@ interface ShopState {
   setUseLoyaltyPoints: (v: boolean) => void;
   addTotalSpend: (n: number) => void;
   toggleBackInStockSub: (productId: string) => void;
+  addRecentSearch: (q: string) => void;
+  clearRecentSearches: () => void;
 }
 
 function makeLineId(item: Omit<CartItem, "id">) {
@@ -203,6 +208,8 @@ export const useShopStore = create<ShopState>()(
 
       cartLastUpdated: null,
       cartReminderDismissed: false,
+
+      recentSearches: [],
 
       setView: (view, opts) => {
         set({
@@ -355,6 +362,14 @@ export const useShopStore = create<ShopState>()(
             : [...subs, productId],
         });
       },
+
+      addRecentSearch: (q) => {
+        const trimmed = q.trim();
+        if (!trimmed) return;
+        const existing = get().recentSearches.filter((s) => s !== trimmed);
+        set({ recentSearches: [trimmed, ...existing].slice(0, 5) });
+      },
+      clearRecentSearches: () => set({ recentSearches: [] }),
     }),
     {
       name: "glimoka-shop",
@@ -373,6 +388,7 @@ export const useShopStore = create<ShopState>()(
         giftCards: s.giftCards,
         cartLastUpdated: s.cartLastUpdated,
         cartReminderDismissed: s.cartReminderDismissed,
+        recentSearches: s.recentSearches,
       }),
     }
   )

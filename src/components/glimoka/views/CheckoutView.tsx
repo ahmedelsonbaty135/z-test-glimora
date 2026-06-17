@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useShopStore, calcSubtotal, calcDiscount, calcShipping, EGYPT_GOVERNORATES } from "@/lib/store";
-import { calcLoyaltyDiscount, calcLoyaltyEarn } from "@/lib/utils";
+import { calcLoyaltyDiscount, calcLoyaltyEarn, getLoyaltyTier } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 
 export function CheckoutView() {
-  const { items, setView, coupon, clearCart, setLastOrder, user, login, loyaltyBalance, useLoyaltyPoints, addLoyalty, addTotalSpend } = useShopStore();
+  const { items, setView, coupon, clearCart, setLastOrder, user, login, loyaltyBalance, useLoyaltyPoints, addLoyalty, addTotalSpend, totalSpend } = useShopStore();
   const [form, setForm] = useState({
     guestName: user?.name || "",
     guestPhone: "",
@@ -33,9 +33,11 @@ export function CheckoutView() {
   const [submitting, setSubmitting] = useState(false);
 
   const subtotal = calcSubtotal(items);
+  const tier = getLoyaltyTier(totalSpend);
+  const tierDiscount = tier.discountPercent > 0 ? Math.floor((subtotal * tier.discountPercent) / 100) : 0;
   const couponDiscount = calcDiscount(subtotal, coupon);
   const loyaltyDiscount = calcLoyaltyDiscount(loyaltyBalance, useLoyaltyPoints, subtotal);
-  const discount = couponDiscount + loyaltyDiscount;
+  const discount = couponDiscount + loyaltyDiscount + tierDiscount;
   const shipping = calcShipping(subtotal, form.governorate, coupon);
   const total = Math.max(0, subtotal - discount + shipping);
 
@@ -271,6 +273,29 @@ export function CheckoutView() {
           <div className="bg-cream-dark/50 rounded-2xl border-2 border-rose-gold/30 p-5 space-y-4">
             <h2 className="font-black text-warm-black text-lg">طلبك</h2>
 
+            {/* Tier discount banner */}
+            {tierDiscount > 0 && (
+              <div
+                className="rounded-xl p-3 flex items-center gap-3 border"
+                style={{ background: tier.bg, borderColor: tier.color + "40" }}
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
+                  style={{ background: tier.color + "20" }}
+                >
+                  {tier.icon}
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold" style={{ color: tier.color }}>
+                    عضوية {tier.name} — خصم {tier.discountPercent}%
+                  </p>
+                  <p className="text-[11px] text-warm-gray">
+                    وفّرت {formatEGP(tierDiscount)} على هذا الطلب!
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Items */}
             <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-luxury pr-1">
               {items.map((item) => (
@@ -299,6 +324,15 @@ export function CheckoutView() {
                 <span className="text-warm-gray">المجموع الفرعي</span>
                 <span className="font-semibold">{formatEGP(subtotal)}</span>
               </div>
+              {tierDiscount > 0 && (
+                <div className="flex justify-between text-rose-gold">
+                  <span className="flex items-center gap-1">
+                    <span>{tier.icon}</span>
+                    خصم عضوية {tier.name} ({tier.discountPercent}%)
+                  </span>
+                  <span className="font-semibold">-{formatEGP(tierDiscount)}</span>
+                </div>
+              )}
               {couponDiscount > 0 && (
                 <div className="flex justify-between text-emerald-soft">
                   <span>خصم الكوبون {coupon && `(${coupon.code})`}</span>

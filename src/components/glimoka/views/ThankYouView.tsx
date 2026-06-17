@@ -1,21 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useShopStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Package, Truck, MessageCircle, Home, Copy, PartyPopper } from "lucide-react";
+import { CheckCircle2, Package, Truck, MessageCircle, Home, Copy, PartyPopper, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
+const CONFETTI_COLORS = ["#6A1B35", "#C9A87C", "#10B981", "#D4AF37", "#E8B4B8"];
+
 export function ThankYouView() {
   const { lastOrderNumber, setView } = useShopStore();
-  const [confettiOn] = useState(true);
 
   useEffect(() => {
     if (!lastOrderNumber) {
       setView("home");
     }
   }, [lastOrderNumber, setView]);
+
+  // Generate confetti pieces once
+  const confettiPieces = useMemo(
+    () =>
+      Array.from({ length: 30 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 2,
+        duration: 2.5 + Math.random() * 2,
+        color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        size: 6 + Math.random() * 8,
+        rotate: Math.random() * 360,
+      })),
+    []
+  );
 
   if (!lastOrderNumber) return null;
 
@@ -27,7 +43,25 @@ export function ThankYouView() {
   const whatsappMsg = `أهلًا GLIMOKA! أكدت الطلب رقم ${lastOrderNumber}. حابب أتأكد من التفاصيل.`;
 
   return (
-    <div className="container mx-auto px-4 py-12 lg:py-20">
+    <div className="container mx-auto px-4 py-12 lg:py-20 relative overflow-hidden">
+      {/* Confetti */}
+      {confettiPieces.map((p) => (
+        <div
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            left: `${p.left}%`,
+            backgroundColor: p.color,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            borderRadius: p.id % 2 === 0 ? "50%" : "2px",
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+            transform: `rotate(${p.rotate}deg)`,
+          }}
+        />
+      ))}
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -35,23 +69,28 @@ export function ThankYouView() {
       >
         {/* Success animation */}
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", delay: 0.2 }}
-          className="relative w-24 h-24 mx-auto mb-6"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", delay: 0.2, stiffness: 200 }}
+          className="relative w-28 h-28 mx-auto mb-6"
         >
           <div className="absolute inset-0 rounded-full bg-emerald-soft/20 animate-ping" />
-          <div className="relative w-24 h-24 rounded-full bg-emerald-soft flex items-center justify-center">
-            <CheckCircle2 className="w-14 h-14 text-white" />
+          <div className="absolute inset-2 rounded-full bg-emerald-soft/10 animate-pulse" />
+          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-emerald-soft to-emerald-600 flex items-center justify-center shadow-luxury-lg">
+            <CheckCircle2 className="w-16 h-16 text-white" />
+            <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-rose-gold animate-bounce-subtle" />
           </div>
         </motion.div>
 
-        {confettiOn && (
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-gold/15 text-burgundy text-sm font-bold mb-4">
-            <PartyPopper className="w-4 h-4" />
-            مبروك! تم تأكيد طلبك
-          </div>
-        )}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-gold/15 text-burgundy text-sm font-bold mb-4"
+        >
+          <PartyPopper className="w-4 h-4" />
+          مبروك! تم تأكيد طلبك
+        </motion.div>
 
         <h1 className="text-3xl sm:text-4xl font-black text-warm-black mb-3">شكرًا لك على طلبك! 💎</h1>
         <p className="text-warm-gray text-lg mb-6">

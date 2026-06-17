@@ -180,24 +180,29 @@ export function ProductsView() {
       {/* Rating */}
       <div>
         <h4 className="font-bold text-warm-black text-sm mb-3">التقييم</h4>
-        <div className="space-y-2">
-          {[4, 3, 0].map((r) => (
+        <div className="space-y-1.5">
+          {[
+            { val: 5, label: "5 نجوم", icon: "★★★★★" },
+            { val: 4, label: "4 نجوم فأكثر", icon: "★★★★☆" },
+            { val: 3, label: "3 نجوم فأكثر", icon: "★★★☆☆" },
+            { val: 0, label: "الكل", icon: "" },
+          ].map((r) => (
             <button
-              key={r}
-              onClick={() => setMinRating(r)}
+              key={r.val}
+              onClick={() => setMinRating(r.val)}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full transition-colors",
-                minRating === r ? "bg-burgundy text-white" : "hover:bg-cream-dark text-warm-black"
+                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm w-full transition-all",
+                minRating === r.val
+                  ? "bg-burgundy text-white shadow-md"
+                  : "hover:bg-cream-dark text-warm-black"
               )}
             >
-              {r > 0 ? (
-                <>
-                  <Star className="w-4 h-4 fill-current" />
-                  {r} نجوم فأكثر
-                </>
-              ) : (
-                "الكل"
+              {r.val > 0 && (
+                <span className={cn("text-xs tracking-tighter", minRating === r.val ? "text-rose-gold-light" : "text-rose-gold")}>
+                  {r.icon}
+                </span>
               )}
+              <span className="font-medium">{r.label}</span>
             </button>
           ))}
         </div>

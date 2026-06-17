@@ -47,6 +47,7 @@ import {
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { ProductCard, type ProductCardData } from "../ProductCard";
+import { AIReviewsSummary } from "../AIReviewsSummary";
 
 interface Review {
   id: string;
@@ -709,6 +710,9 @@ export function ProductDetailView() {
                   </div>
                 </div>
               </div>
+
+              {/* AI Reviews Summary */}
+              <AIReviewsSummary productId={product.id} reviewCount={product.reviewCount} />
 
               {/* Review list */}
               <div className="space-y-3">

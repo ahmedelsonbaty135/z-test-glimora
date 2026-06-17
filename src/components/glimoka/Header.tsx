@@ -20,6 +20,8 @@ import {
   LogOut,
   ChevronLeft,
   Gift,
+  Clock,
+  TrendingUp,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { BrandLogo } from "./BrandLogo";
@@ -95,6 +97,9 @@ export function Header() {
     logout,
     searchQuery,
     setSearch,
+    recentSearches,
+    addRecentSearch,
+    clearRecentSearches,
   } = useShopStore();
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -147,7 +152,21 @@ export function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearch(localSearch);
+    if (localSearch.trim()) {
+      setSearch(localSearch);
+      addRecentSearch(localSearch);
+      setView("products", { category: selectedCategory || undefined });
+      setSearchOpen(false);
+      setShowSuggestions(false);
+    }
+  };
+
+  const TRENDING_SEARCHES = ["سوار", "قلادة", "خاتم خطوبة", "ذهب 18", "هدية"];
+
+  const handleRecentSearch = (q: string) => {
+    setLocalSearch(q);
+    setSearch(q);
+    addRecentSearch(q);
     setView("products", { category: selectedCategory || undefined });
     setSearchOpen(false);
     setShowSuggestions(false);
@@ -350,6 +369,58 @@ export function Header() {
                       >
                         عرض كل النتائج ←
                       </button>
+                    </motion.div>
+                  )}
+                  {/* Recent + Trending searches (when empty) */}
+                  {showSuggestions && suggestions.length === 0 && !localSearch.trim() && (recentSearches.length > 0 || true) && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute top-full right-0 left-0 mt-1 bg-white rounded-xl shadow-luxury-lg border border-rose-gold/30 overflow-hidden z-50"
+                    >
+                      {recentSearches.length > 0 && (
+                        <>
+                          <div className="flex items-center justify-between px-3 py-2 bg-cream-dark border-b border-rose-gold/15">
+                            <p className="text-[11px] text-warm-gray font-semibold">عمليات البحث الأخيرة</p>
+                            <button
+                              type="button"
+                              onMouseDown={() => clearRecentSearches()}
+                              className="text-[10px] text-danger-soft hover:underline"
+                            >
+                              مسح
+                            </button>
+                          </div>
+                          {recentSearches.map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              onMouseDown={() => handleRecentSearch(s)}
+                              className="w-full flex items-center gap-2 px-3 py-2 hover:bg-cream-dark transition-colors text-right text-sm text-warm-black"
+                            >
+                              <Clock className="w-3.5 h-3.5 text-warm-gray shrink-0" />
+                              {s}
+                            </button>
+                          ))}
+                        </>
+                      )}
+                      <div className="px-3 py-2 bg-cream-dark border-b border-rose-gold/15">
+                        <p className="text-[11px] text-warm-gray font-semibold flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3 text-burgundy" />
+                          عمليات البحث الرائجة
+                        </p>
+                      </div>
+                      <div className="p-2 flex flex-wrap gap-1.5">
+                        {TRENDING_SEARCHES.map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onMouseDown={() => handleRecentSearch(t)}
+                            className="text-xs bg-cream-dark hover:bg-burgundy hover:text-white text-warm-black px-2.5 py-1 rounded-full transition-colors"
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
                     </motion.div>
                   )}
                 </div>
