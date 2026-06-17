@@ -294,4 +294,127 @@ Generating 34 jewelry images via z-ai-web-dev-sdk (hero, 4 categories, 3 brand, 
 7. Add email notification templates
 8. Add sales analytics reports (by period, category, customer)
 
+---
+
+## Task ID: 9 — Cron Round 3: Admin Coupon CRUD + Reviews Moderation + Sales Reports + Wishlist→Cart (Completed by review agent)
+
+**Trigger:** Recurring cron job (webDevReview, every 15 min)
+
+**Work Log:**
+
+### QA Findings
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime/console errors
+- ✅ All Round 1 & 2 features verified working (mobile menu, quick view, size guide, loyalty, admin products, semantic search, re-order)
+- 🔄 Image generation continues (6/24 product images complete)
+
+### New Features Added
+
+#### 1. Admin Coupon CRUD (Full management)
+- **New API**: `GET/POST/PATCH/DELETE /api/admin/coupons` — full CRUD with validation
+  - POST creates coupon with code uniqueness check, type/value/minOrder/maxDiscount/usageLimit/perCustomerLimit/dateRange
+  - PATCH updates allowed fields (cannot change code)
+  - DELETE removes coupon and its usages
+- **New component**: `AdminCoupons.tsx` — coupon management interface
+  - Grid of coupon cards with dashed rose-gold borders, showing code, type, value, min order, usage progress bar, end date with expiry indicator
+  - Toggle active/inactive with a single click
+  - "New Coupon" button opens form dialog
+  - Edit/delete actions per coupon
+  - Full form dialog: code, type (4 types), value, minOrder, maxDiscount, usageLimit, perCustomerLimit, start/end dates, active switch
+- **Replaced** the static read-only coupons tab with the new interactive AdminCoupons component
+- **Verified**: Created "SUMMER25" coupon → toast "تم إنشاء الكوبون" → appeared in list → cleaned up ✓
+
+#### 2. Admin Reviews Moderation
+- **New API**: `GET/PATCH/DELETE /api/admin/reviews` — moderation with product rating recalculation
+  - GET supports status filter (pending/approved/all), includes product info
+  - PATCH approves/rejects review, recalculates product aggregate rating
+  - DELETE removes review and recalculates product rating
+- **New component**: `AdminReviews.tsx` — reviews moderation interface
+  - Three filter tabs: قيد الانتظار (pending) / مُوافق عليها (approved) / الكل (all)
+  - Review cards with product thumbnail, author, star rating, title, body, date
+  - Approve/un-approve/delete actions per review
+  - Color-coded status badges (amber for pending, emerald for approved)
+- **Added** new "المراجعات" tab to admin dashboard
+- **Verified**: Approved reviews show with "إلغاء الموافقة" button, pending shows "موافقة" button ✓
+
+#### 3. Sales Analytics Reports
+- **New API**: `GET /api/admin/reports?type=sales-by-category|sales-by-day|top-customers|top-products&days=N`
+  - sales-by-category: aggregates order items by product category (revenue + count)
+  - sales-by-day: daily revenue and order count over N days
+  - top-customers: top 10 by total spend
+  - top-products: top 10 by revenue
+- **New component**: `AdminReports.tsx` — analytics dashboard
+  - 4 report type cards (category pie, daily line, top products bars, top customers table)
+  - Period selector: 7/30/90 days
+  - Sales-by-category: Pie chart + legend with revenue and count
+  - Sales-by-day: Line chart with revenue + orders (dual lines)
+  - Top products: Ranked list with progress bars
+  - Top customers: Table with rank, name, phone, order count, total spent
+- **Added** new "التقارير" tab to admin dashboard
+- **Verified**: 90-day report shows 880 EGP bracelet sales, top products list renders ✓
+
+#### 4. Wishlist → Cart Move
+- **New component**: `WishlistCard.tsx` — dedicated wishlist item card
+  - Product image, name, rating, price with discount badge
+  - "نقل للسلة" (Move to cart) button — adds to cart with default customization and removes from wishlist
+  - Remove (X) button to remove from wishlist without adding to cart
+  - Animated entry/exit with framer-motion
+- **AccountView wishlist tab enhanced**:
+  - "نقل الكل للسلة" (Move all to cart) bulk action button
+  - Item count indicator
+  - Uses WishlistCard instead of ProductCard for wishlist-specific actions
+- **Verified**: Added 2 products to wishlist → clicked "نقل للسلة" → toast "تم نقل 'خاتم التوقيع الروديوم' للسلة" → cart has 1 item, wishlist has 1 remaining ✓
+
+### Styling Improvements
+- Admin tabs now wrap on smaller screens (flex-wrap h-auto) to accommodate 6 tabs
+- Coupon cards with dashed borders, usage progress bars (red >80%), expiry indicators
+- Reviews with color-coded status (amber pending, emerald approved), product thumbnails
+- Reports with 4-card type selector, period toggle, pie/line/bar chart visualizations
+- Wishlist cards with remove (X) button, move-to-cart CTA, heart icon indicator
+- Loading spinner in reports (border-3 rotating)
+
+### Files Modified/Created
+- `src/app/api/admin/coupons/route.ts` — NEW: Coupon CRUD API
+- `src/app/api/admin/reviews/route.ts` — NEW: Reviews moderation API with rating recalc
+- `src/app/api/admin/reports/route.ts` — NEW: Sales analytics reports API (4 report types)
+- `src/components/glimoka/AdminCoupons.tsx` — NEW: Coupon management UI with form dialog
+- `src/components/glimoka/AdminReviews.tsx` — NEW: Reviews moderation UI
+- `src/components/glimoka/AdminReports.tsx` — NEW: Analytics dashboard with charts
+- `src/components/glimoka/WishlistCard.tsx` — NEW: Wishlist item card with move-to-cart
+- `src/components/glimoka/views/AdminView.tsx` — Added 3 new tabs (coupons replaced, reviews, reports), Star import
+- `src/components/glimoka/views/AccountView.tsx` — Wishlist tab uses WishlistCard + "move all" bulk action
+
+### Verification Results
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime errors
+- ✅ Coupon CRUD: Created SUMMER25 → toast confirmed → cleaned up
+- ✅ Reviews moderation: Approved reviews show with un-approve/delete actions
+- ✅ Sales reports: 90-day category report shows 880 EGP, top products renders
+- ✅ Wishlist → cart: Moved item, cart increased, wishlist decreased, toast confirmed
+- ✅ All 6 admin tabs functional (Orders, Products, Inventory, Coupons, Reviews, Reports)
+- ✅ All existing features still working
+
+### Admin Dashboard Now Has 6 Tabs
+1. الطلبات (Orders) — order list with status update dropdowns
+2. المنتجات (Products) — full CRUD with form dialog
+3. المخزون (Inventory) — low-stock alerts
+4. الكوبونات (Coupons) — full CRUD with form dialog
+5. المراجعات (Reviews) — moderation (approve/reject/delete)
+6. التقارير (Reports) — 4 analytics report types with charts
+
+### Image Generation Status
+- Hero, 4 categories, 3 brand images: ✅ Complete (7/7)
+- Product images: 6/24 complete — auto-restart wrapper continues in background
+
+### Next Phase Recommendations
+1. Complete remaining product images (18/24)
+2. Add customer address book management (CRUD multiple addresses)
+3. Add abandoned cart recovery (WhatsApp reminder after 1h/24h)
+4. Add email notification templates (order confirmation, shipping, review request)
+5. Add product comparison feature
+6. Add gift card purchase flow
+7. Add advanced product filtering (by metal, size, color with URL params)
+8. Add customer reviews on product page with photo upload
+
+
 

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingBag, Phone, Mail, Gift, ArrowLeft, Search, RotateCw } from "lucide-react";
 import { ProductCard, type ProductCardData } from "../ProductCard";
+import { WishlistCard } from "../WishlistCard";
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -313,11 +314,50 @@ export function AccountView() {
               <Button onClick={() => setView("products")} className="bg-burgundy hover:bg-burgundy-deep">تصفح المنتجات</Button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {wishlistProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-warm-gray">{wishlistProducts.length} منتج في المفضلة</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-burgundy text-burgundy hover:bg-burgundy hover:text-white"
+                  onClick={() => {
+                    wishlistProducts.forEach((p) => {
+                      const metals = p.metalOptions.split(",").map((m) => m.trim());
+                      addToCart({
+                        productId: p.id,
+                        slug: p.slug,
+                        name: p.name,
+                        image: p.images[0]?.url || "/products/placeholder.jpg",
+                        basePrice: p.basePrice,
+                        unitPrice: p.basePrice,
+                        quantity: 1,
+                        customization: {
+                          metal: metals[0] || "SILVER_925",
+                          size: "17",
+                          font: "خط عربي تقليدي",
+                          name1: "",
+                          name2: "",
+                          giftBox: false,
+                          giftCard: "",
+                        },
+                        maxStock: p.stock,
+                      } as any);
+                    });
+                    toast.success(`تم نقل ${wishlistProducts.length} منتج للسلة`);
+                    setView("cart");
+                  }}
+                >
+                  <ShoppingBag className="w-4 h-4 ml-1" />
+                  نقل الكل للسلة
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                {wishlistProducts.map((p) => (
+                  <WishlistCard key={p.id} product={p} />
+                ))}
+              </div>
+            </>
           )}
         </TabsContent>
 

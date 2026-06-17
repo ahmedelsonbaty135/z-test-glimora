@@ -35,6 +35,7 @@ import {
   Lock,
   Search,
   ArrowLeft,
+  Star,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -53,6 +54,9 @@ import {
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
 import { AdminProducts } from "../AdminProducts";
+import { AdminCoupons } from "../AdminCoupons";
+import { AdminReviews } from "../AdminReviews";
+import { AdminReports } from "../AdminReports";
 
 interface AdminStats {
   kpis: {
@@ -294,13 +298,15 @@ export function AdminView() {
           </CardContent>
         </Card>
 
-        {/* Tabs: Orders, Products, Alerts, Coupons */}
+        {/* Tabs: Orders, Products, Alerts, Coupons, Reviews, Reports */}
         <Tabs defaultValue="orders" className="space-y-4">
-          <TabsList className="bg-cream-dark">
+          <TabsList className="bg-cream-dark flex-wrap h-auto">
             <TabsTrigger value="orders"><ShoppingCart className="w-4 h-4 ml-1" /> الطلبات</TabsTrigger>
             <TabsTrigger value="products"><Package className="w-4 h-4 ml-1" /> المنتجات</TabsTrigger>
-            <TabsTrigger value="alerts"><AlertTriangle className="w-4 h-4 ml-1" /> تنبيهات المخزون</TabsTrigger>
+            <TabsTrigger value="alerts"><AlertTriangle className="w-4 h-4 ml-1" /> المخزون</TabsTrigger>
             <TabsTrigger value="coupons"><Tag className="w-4 h-4 ml-1" /> الكوبونات</TabsTrigger>
+            <TabsTrigger value="reviews"><Star className="w-4 h-4 ml-1" /> المراجعات</TabsTrigger>
+            <TabsTrigger value="reports"><TrendingUp className="w-4 h-4 ml-1" /> التقارير</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders">
@@ -429,30 +435,15 @@ export function AdminView() {
           </TabsContent>
 
           <TabsContent value="coupons">
-            <Card className="bg-white border-rose-gold/20">
-              <CardHeader>
-                <CardTitle className="text-warm-black text-lg">الكوبونات النشطة</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {[
-                    { code: "WELCOME10", type: "خصم 10%", desc: "لكل الطلبات" },
-                    { code: "GLIMOKA50", type: "خصم 50 ج.م", desc: "للطلبات فوق 500 ج.م" },
-                    { code: "FREESHIP", type: "شحن مجاني", desc: "لكل الطلبات" },
-                    { code: "VALENTINE15", type: "خصم 15%", desc: "للطلبات فوق 800 ج.م" },
-                  ].map((c) => (
-                    <div key={c.code} className="p-4 rounded-xl border-2 border-dashed border-rose-gold/40 bg-cream-dark/30">
-                      <div className="flex items-center justify-between">
-                        <code className="font-mono font-bold text-burgundy">{c.code}</code>
-                        <span className="text-xs font-bold text-emerald-soft bg-emerald-soft/10 px-2 py-0.5 rounded-full">نشط</span>
-                      </div>
-                      <p className="font-bold text-warm-black text-sm mt-1">{c.type}</p>
-                      <p className="text-xs text-warm-gray">{c.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <AdminCoupons />
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <AdminReviews />
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <AdminReports />
           </TabsContent>
         </Tabs>
       </div>
