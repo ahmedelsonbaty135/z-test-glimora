@@ -32,6 +32,36 @@ function toSnakeKey(key: string): string {
 // ===== Helper: build query filters =====
 function applyFilters(q: any, where: any, table: string): any {
   if (!where) return q;
+
+  // Handle Prisma-style OR operator
+  if (Array.isArray(where.OR)) {
+    // Supabase doesn't support OR directly via filter chaining.
+    // We use .or() with filter strings.
+    const orParts: string[] = [];
+    for (const cond of where.OR) {
+      for (const [key, value] of Object.entries(cond)) {
+        const snakeKey = toSnakeKey(key);
+        if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+          for (const [op, opVal] of Object.entries(value as any)) {
+            if (op === "contains") {
+              orParts.push(`${snakeKey}.ilike.%${opVal}%`);
+            } else if (op === "eq") {
+              orParts.push(`${snakeKey}.eq.${opVal}`);
+            }
+          }
+        } else {
+          orParts.push(`${snakeKey}.eq.${value}`);
+        }
+      }
+    }
+    if (orParts.length > 0) {
+      q = q.or(orParts.join(","));
+    }
+    // Remove OR from where so it's not processed again
+    const { OR, ...rest } = where;
+    where = rest;
+  }
+
   for (const [key, value] of Object.entries(where)) {
     const snakeKey = toSnakeKey(key);
     if (value === null) {
@@ -48,6 +78,7 @@ function applyFilters(q: any, where: any, table: string): any {
         else if (op === "gt") q = q.gt(snakeKey, safeVal);
         else if (op === "lt") q = q.lt(snakeKey, safeVal);
         else if (op === "neq") q = q.neq(snakeKey, safeVal);
+        else if (op === "not") q = q.neq(snakeKey, safeVal);
         else if (op === "in") q = q.in(snakeKey, safeVal);
         else if (op === "contains") {
           // ILIKE for case-insensitive contains
@@ -145,14 +176,8 @@ export const productRepo = {
   },
 
   async update(opts: { where: any; data: any }) {
-    let q = supabaseAdmin.from("products").update(toSnakeCase(opts.data));
-    q = applyFilters(q, opts.where, "products");
-    const { data, error } = await q.select().single();
-    if (error) {
-      console.error("[product.update]", error.message);
-      return null;
-    }
-    return toCamelCase(data);
+    // Use updateRow helper which handles increment/decrement
+    return updateRow("products", opts.where, opts.data);
   },
 
   async delete(opts: { where: any }) {

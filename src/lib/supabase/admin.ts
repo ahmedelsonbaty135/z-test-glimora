@@ -148,6 +148,65 @@ export async function updateRow<T = any>(
   eq: Record<string, any>,
   patch: Record<string, any>
 ): Promise<T | null> {
+  // Handle Prisma-style { increment, decrement } operators
+  // by doing a fetch first, computing the new value, then updating.
+  const resolvedPatch: Record<string, any> = {};
+  let needsFetch = false;
+  for (const [key, value] of Object.entries(patch)) {
+    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+      if ("increment" in value) {
+        needsFetch = true;
+        resolvedPatch[key] = { __op: "increment", amount: value.increment };
+      } else if ("decrement" in value) {
+        needsFetch = true;
+        resolvedPatch[key] = { __op: "decrement", amount: value.decrement };
+      } else {
+        resolvedPatch[key] = value;
+      }
+    } else {
+      resolvedPatch[key] = value;
+    }
+  }
+
+  // If we need to increment/decrement, fetch the current value first
+  if (needsFetch) {
+    let fetchQ = supabaseAdmin.from(table).select("*");
+    for (const [key, value] of Object.entries(eq)) {
+      fetchQ = fetchQ.eq(toSnakeKey(key), value);
+    }
+    const { data: existing, error: fetchErr } = await fetchQ.single();
+    if (fetchErr || !existing) {
+      console.error(`[updateRow ${table}] fetch for increment failed:`, fetchErr?.message);
+      return null;
+    }
+    // Compute new values
+    const finalPatch: Record<string, any> = {};
+    for (const [key, val] of Object.entries(resolvedPatch)) {
+      if (val && typeof val === "object" && "__op" in val) {
+        const snakeKey = toSnakeKey(key);
+        const current = Number(existing[snakeKey]) || 0;
+        if (val.__op === "increment") {
+          finalPatch[snakeKey] = current + (val.amount || 0);
+        } else if (val.__op === "decrement") {
+          finalPatch[snakeKey] = Math.max(0, current - (val.amount || 0));
+        }
+      } else {
+        finalPatch[toSnakeKey(key)] = toSnakeCase(val);
+      }
+    }
+    let q = supabaseAdmin.from(table).update(finalPatch);
+    for (const [key, value] of Object.entries(eq)) {
+      q = q.eq(toSnakeKey(key), value);
+    }
+    const { data, error } = await q.select().single();
+    if (error) {
+      console.error(`[updateRow ${table}]`, error.message);
+      return null;
+    }
+    return toCamelCase(data) as T;
+  }
+
+  // Normal update without increment/decrement
   let q = supabaseAdmin.from(table).update(toSnakeCase(patch));
   for (const [key, value] of Object.entries(eq)) {
     q = q.eq(toSnakeKey(key), value);
