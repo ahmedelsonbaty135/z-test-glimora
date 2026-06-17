@@ -5,6 +5,7 @@ import { Header } from "@/components/glimoka/Header";
 import { Footer } from "@/components/glimoka/Footer";
 import { FloatingWidgets } from "@/components/glimoka/FloatingWidgets";
 import { QuickViewManager } from "@/components/glimoka/QuickViewManager";
+import { CompareBar } from "@/components/glimoka/CompareBar";
 import { HomeView } from "@/components/glimoka/views/HomeView";
 import { ProductsView } from "@/components/glimoka/views/ProductsView";
 import { ProductDetailView } from "@/components/glimoka/views/ProductDetailView";
@@ -13,6 +14,8 @@ import { CheckoutView } from "@/components/glimoka/views/CheckoutView";
 import { ThankYouView } from "@/components/glimoka/views/ThankYouView";
 import { AccountView } from "@/components/glimoka/views/AccountView";
 import { AdminView } from "@/components/glimoka/views/AdminView";
+import { CompareView } from "@/components/glimoka/views/CompareView";
+import { GiftCardsView } from "@/components/glimoka/views/GiftCardsView";
 import {
   AboutView,
   ContactView,
@@ -45,6 +48,8 @@ export default function Home() {
       "shipping-policy": "سياسة الشحن | GLIMOKA",
       "return-policy": "سياسة الإرجاع | GLIMOKA",
       "size-guide": "دليل المقاسات | GLIMOKA",
+      compare: "مقارنة المنتجات | GLIMOKA",
+      "gift-cards": "بطاقات الهدايا | GLIMOKA",
     };
     document.title = titles[view] || "GLIMOKA";
   }, [view]);
@@ -81,6 +86,10 @@ export default function Home() {
         return <ReturnPolicyView />;
       case "size-guide":
         return <SizeGuideView />;
+      case "compare":
+        return <CompareView />;
+      case "gift-cards":
+        return <GiftCardsView />;
       default:
         return <HomeView />;
     }
@@ -93,6 +102,8 @@ export default function Home() {
       <Footer />
       <FloatingWidgets />
       <QuickViewManager />
+      <CompareBar />
     </div>
   );
 }
+

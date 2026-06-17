@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingBag, Phone, Mail, Gift, ArrowLeft, Search, RotateCw } from "lucide-react";
 import { ProductCard, type ProductCardData } from "../ProductCard";
 import { WishlistCard } from "../WishlistCard";
+import { AddressBook } from "../AddressBook";
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -190,9 +191,10 @@ export function AccountView() {
       </div>
 
       <Tabs defaultValue="orders" className="space-y-4">
-        <TabsList className="grid grid-cols-2 sm:grid-cols-4 bg-cream-dark h-auto">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-5 bg-cream-dark h-auto">
           <TabsTrigger value="orders" className="text-xs sm:text-sm"><Package className="w-4 h-4 ml-1" /> طلباتي</TabsTrigger>
           <TabsTrigger value="wishlist" className="text-xs sm:text-sm"><Heart className="w-4 h-4 ml-1" /> المفضلة</TabsTrigger>
+          <TabsTrigger value="addresses" className="text-xs sm:text-sm"><MapPin className="w-4 h-4 ml-1" /> العناوين</TabsTrigger>
           <TabsTrigger value="profile" className="text-xs sm:text-sm"><User className="w-4 h-4 ml-1" /> الملف</TabsTrigger>
           <TabsTrigger value="settings" className="text-xs sm:text-sm"><Settings className="w-4 h-4 ml-1" /> الإعدادات</TabsTrigger>
         </TabsList>
@@ -359,6 +361,11 @@ export function AccountView() {
               </div>
             </>
           )}
+        </TabsContent>
+
+        {/* Addresses */}
+        <TabsContent value="addresses">
+          <AddressBook />
         </TabsContent>
 
         {/* Profile */}

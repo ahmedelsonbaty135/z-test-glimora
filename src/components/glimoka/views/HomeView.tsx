@@ -13,6 +13,13 @@ import {
   Ruler,
   Award,
   TrendingUp,
+  Shield,
+  Truck,
+  CreditCard,
+  RotateCcw,
+  Headphones,
+  Gem,
+  Scissors,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { ProductCard, type ProductCardData } from "../ProductCard";
@@ -523,6 +530,121 @@ export function HomeView() {
           </div>
         </section>
       )}
+
+      {/* ===== WHY GLIMOKA — Trust Features ===== */}
+      <section className="container mx-auto px-4">
+        <SectionHeading
+          eyebrow="لماذا GLIMOKA؟"
+          title="تجربة فاخرة من البداية للنهاية"
+          subtitle="نعدك بأكثر من مجرد مجوهرة — نعدك بتجربة تليق بك"
+        />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+          {[
+            {
+              icon: Gem,
+              title: "خامات أصلية",
+              desc: "ذهب وفضة عيار 925 و18 و21 — بشهادات ضمان",
+              color: "text-rose-gold",
+              bg: "bg-rose-gold/10",
+            },
+            {
+              icon: Scissors,
+              title: "نقش يدوي",
+              desc: "حرفيون مهرة ينقشون اسمك بدقة فائقة",
+              color: "text-burgundy",
+              bg: "bg-burgundy/10",
+            },
+            {
+              icon: Truck,
+              title: "شحن سريع",
+              desc: "توصيل لكل محافظات مصر خلال 2-5 أيام",
+              color: "text-emerald-soft",
+              bg: "bg-emerald-soft/10",
+            },
+            {
+              icon: RotateCcw,
+              title: "إرجاع سهل",
+              desc: "استبدال أو إرجاع خلال 14 يوم بدون تعقيد",
+              color: "text-burgundy-light",
+              bg: "bg-burgundy-light/10",
+            },
+          ].map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-white rounded-2xl border border-rose-gold/20 p-5 text-center card-luxury-hover hover:border-rose-gold/50 group"
+            >
+              <div className={`w-14 h-14 rounded-2xl ${f.bg} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                <f.icon className={`w-7 h-7 ${f.color}`} />
+              </div>
+              <h3 className="font-bold text-warm-black text-sm mb-1">{f.title}</h3>
+              <p className="text-xs text-warm-gray leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Stats bar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="mt-8 bg-burgundy-gradient rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
+        >
+          <div className="diamond-pattern absolute inset-0 opacity-30" />
+          <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {[
+              { value: "+5000", label: "عميل سعيد" },
+              { value: "4.8★", label: "متوسط التقييم" },
+              { value: "+12K", label: "قطعة مُخصصة" },
+              { value: "24/7", label: "دعم متواصل" },
+            ].map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <p className="text-3xl sm:text-4xl font-black text-rose-gold-light">{s.value}</p>
+                <p className="text-xs sm:text-sm text-white/70 mt-1">{s.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ===== GIFT CARDS PROMO BANNER ===== */}
+      <section className="container mx-auto px-4">
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          onClick={() => setView("gift-cards")}
+          className="w-full bg-gradient-to-l from-burgundy via-burgundy-light to-rose-gold rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden group text-right"
+        >
+          <div className="absolute inset-0 shimmer-sweep opacity-40" />
+          <div className="relative flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-xs font-bold mb-2">
+                <Gift className="w-3.5 h-3.5 text-rose-gold-light" />
+                جديد
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black mb-1">
+                بطاقات هدايا GLIMOKA الرقمية
+              </h3>
+              <p className="text-sm text-white/80">
+                أهدِ من تحب تجربة مجوهرات فاخرة — تُسلّم خلال دقائق
+              </p>
+            </div>
+            <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-transform">
+              <Gift className="w-8 h-8 sm:w-10 sm:h-10 text-rose-gold-light" />
+            </div>
+          </div>
+        </motion.button>
+      </section>
 
       {/* ===== NEWSLETTER ===== */}
       <section className="container mx-auto px-4">

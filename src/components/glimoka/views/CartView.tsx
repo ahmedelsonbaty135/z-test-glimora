@@ -1,26 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { useShopStore, calcSubtotal, calcDiscount, calcShipping } from "@/lib/store";
+import { useShopStore, calcSubtotal, calcDiscount, calcShipping, calcGiftCardsTotal, GIFT_CARD_DESIGNS } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag, X, Truck, Sparkles, Gift } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag, X, Truck, Sparkles, Gift, Mail, User } from "lucide-react";
 import { formatEGP, calcLoyaltyDiscount, calcLoyaltyEarn } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 export function CartView() {
-  const { items, updateQty, removeFromCart, setView, coupon, applyCoupon, removeCoupon, clearCart, loyaltyBalance, useLoyaltyPoints, setUseLoyaltyPoints } = useShopStore();
+  const { items, updateQty, removeFromCart, setView, coupon, applyCoupon, removeCoupon, clearCart, loyaltyBalance, useLoyaltyPoints, setUseLoyaltyPoints, giftCards, removeGiftCard } = useShopStore();
   const [couponInput, setCouponInput] = useState("");
   const [applying, setApplying] = useState(false);
 
   const subtotal = calcSubtotal(items);
+  const giftCardsTotal = calcGiftCardsTotal(giftCards);
   const couponDiscount = calcDiscount(subtotal, coupon);
   const loyaltyDiscount = calcLoyaltyDiscount(loyaltyBalance, useLoyaltyPoints, subtotal);
   const discount = couponDiscount + loyaltyDiscount;
   const shipping = calcShipping(subtotal, "القاهرة", coupon);
-  const total = Math.max(0, subtotal - discount + shipping);
+  const total = Math.max(0, subtotal - discount + shipping + giftCardsTotal);
   const willEarn = calcLoyaltyEarn(total);
 
   const applyCouponHandler = async () => {
@@ -179,6 +180,77 @@ export function CartView() {
             ))}
           </AnimatePresence>
 
+          {/* Gift cards in cart */}
+          {giftCards.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <h3 className="text-sm font-bold text-warm-black flex items-center gap-2">
+                <Gift className="w-4 h-4 text-rose-gold" />
+                بطاقات الهدايا ({giftCards.length})
+              </h3>
+              {giftCards.map((g) => {
+                const design = GIFT_CARD_DESIGNS.find((d) => d.id === g.design) || GIFT_CARD_DESIGNS[0];
+                return (
+                  <motion.div
+                    key={g.id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    className="bg-white rounded-2xl border border-rose-gold/20 p-4 flex gap-3"
+                  >
+                    <div
+                      className="w-16 h-12 rounded-lg shrink-0 flex items-center justify-center"
+                      style={{ background: `linear-gradient(135deg, ${design.color}, ${design.color}cc)` }}
+                    >
+                      <Gift className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-bold text-warm-black text-sm">
+                            بطاقة هدية — {formatEGP(g.amount)}
+                          </p>
+                          <p className="text-xs text-warm-gray flex items-center gap-1 mt-0.5">
+                            <User className="w-3 h-3" />
+                            {g.recipientName}
+                          </p>
+                          <p className="text-[11px] text-warm-gray flex items-center gap-1" dir="ltr">
+                            <Mail className="w-3 h-3" />
+                            {g.recipientEmail}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            removeGiftCard(g.id);
+                            toast.success("أُزيلت بطاقة الهدية");
+                          }}
+                          className="p-1.5 text-warm-gray hover:text-danger-soft hover:bg-danger-soft/10 rounded-lg transition-colors"
+                          aria-label="حذف"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      {g.message && (
+                        <p className="text-[11px] text-warm-gray italic mt-1 line-clamp-1">
+                          "{g.message}"
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Add gift card CTA */}
+          <button
+            onClick={() => setView("gift-cards")}
+            className="w-full mt-3 p-3 rounded-2xl border-2 border-dashed border-rose-gold/30 hover:border-burgundy hover:bg-rose-gold/5 transition-colors text-sm text-warm-gray hover:text-burgundy flex items-center justify-center gap-2"
+          >
+            <Gift className="w-4 h-4" />
+            أضف بطاقة هدية
+          </button>
+
           <button
             onClick={() => setView("products")}
             className="text-sm text-burgundy hover:text-burgundy-light flex items-center gap-1 mt-2"
@@ -272,6 +344,12 @@ export function CartView() {
                 <div className="flex justify-between text-burgundy">
                   <span className="flex items-center gap-1"><Sparkles className="w-3 h-3" /> خصم النقاط</span>
                   <span className="font-semibold">-{formatEGP(loyaltyDiscount)}</span>
+                </div>
+              )}
+              {giftCardsTotal > 0 && (
+                <div className="flex justify-between text-rose-gold">
+                  <span className="flex items-center gap-1"><Gift className="w-3 h-3" /> بطاقات الهدايا ({giftCards.length})</span>
+                  <span className="font-semibold">{formatEGP(giftCardsTotal)}</span>
                 </div>
               )}
               <div className="flex justify-between">

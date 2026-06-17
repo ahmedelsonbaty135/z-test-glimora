@@ -6,7 +6,7 @@ import { BrandLogo } from "./BrandLogo";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const FOOTER_LINKS: { title: string; links: { label: string; view: "about" | "contact" | "faq" | "shipping-policy" | "return-policy" | "track-order" | "size-guide" | "products" | "home" }[] }[] = [
+const FOOTER_LINKS: { title: string; links: { label: string; view: "about" | "contact" | "faq" | "shipping-policy" | "return-policy" | "track-order" | "size-guide" | "products" | "home" | "gift-cards" | "compare" }[] }[] = [
   {
     title: "تسوق",
     links: [
@@ -15,6 +15,7 @@ const FOOTER_LINKS: { title: string; links: { label: string; view: "about" | "co
       { label: "القلائد", view: "products" },
       { label: "الخواتم", view: "products" },
       { label: "العروض", view: "products" },
+      { label: "بطاقات الهدايا", view: "gift-cards" },
     ],
   },
   {

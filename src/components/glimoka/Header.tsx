@@ -19,6 +19,7 @@ import {
   Info,
   LogOut,
   ChevronLeft,
+  Gift,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { BrandLogo } from "./BrandLogo";
@@ -36,7 +37,8 @@ import { CartDrawer } from "./CartDrawer";
 type ViewName =
   | "home" | "products" | "product" | "cart" | "checkout" | "thankyou"
   | "account" | "admin" | "about" | "contact" | "faq"
-  | "track-order" | "shipping-policy" | "return-policy" | "size-guide";
+  | "track-order" | "shipping-policy" | "return-policy" | "size-guide"
+  | "compare" | "gift-cards";
 
 const NAV_ITEMS: { label: string; view: ViewName; category?: string }[] = [
   { label: "الرئيسية", view: "home" },
@@ -44,6 +46,7 @@ const NAV_ITEMS: { label: string; view: ViewName; category?: string }[] = [
   { label: "القلائد", view: "products", category: "necklaces" },
   { label: "الخواتم", view: "products", category: "rings" },
   { label: "العروض", view: "products", category: "offers" },
+  { label: "بطاقات الهدايا", view: "gift-cards" },
   { label: "من نحن", view: "about" },
   { label: "اتصل بنا", view: "contact" },
 ];
@@ -61,6 +64,7 @@ const MOBILE_NAV_SECTIONS: {
       { label: "القلائد", view: "products", category: "necklaces", icon: Tag },
       { label: "الخواتم", view: "products", category: "rings", icon: Tag },
       { label: "العروض", view: "products", category: "offers", icon: Tag },
+      { label: "بطاقات الهدايا", view: "gift-cards", icon: Gift },
     ],
   },
   {

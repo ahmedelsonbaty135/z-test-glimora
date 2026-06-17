@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, ShoppingBag, Star, Eye } from "lucide-react";
+import { Heart, ShoppingBag, Star, Eye, GitCompare } from "lucide-react";
 import { motion } from "framer-motion";
 import { useShopStore, type CartItem } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -26,10 +26,11 @@ export interface ProductCardData {
 }
 
 export function ProductCard({ product }: { product: ProductCardData }) {
-  const { openProduct, addToCart, toggleWishlist, wishlist, openQuickView } = useShopStore();
+  const { openProduct, addToCart, toggleWishlist, wishlist, openQuickView, toggleCompare, compareList } = useShopStore();
   const image = product.images[0]?.url || "/products/placeholder.jpg";
   const discount = discountPercent(product.basePrice, product.comparePrice);
   const isWishlisted = wishlist.includes(product.id);
+  const isComparing = compareList.includes(product.id);
 
   const quickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,6 +56,19 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       maxStock: product.stock,
     } as Omit<CartItem, "id">);
     toast.success(`تمت إضافة "${product.name}" للسلة`);
+  };
+
+  const handleCompare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isComparing) {
+      toggleCompare(product.id);
+      toast.success("أُزيل من المقارنة");
+    } else if (compareList.length >= 3) {
+      toast.error("المقارنة تصل إلى 3 منتجات كحد أقصى");
+    } else {
+      toggleCompare(product.id);
+      toast.success(`أُضيف للمقارنة (${compareList.length + 1}/3)`);
+    }
   };
 
   return (
@@ -83,23 +97,38 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         )}
       </div>
 
-      {/* Wishlist */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleWishlist(product.id);
-          toast.success(isWishlisted ? "أُزيل من المفضلة" : "أُضيف للمفضلة");
-        }}
-        className="absolute top-3 left-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white transition-colors"
-        aria-label="أضف للمفضلة"
-      >
-        <Heart
+      {/* Wishlist + Compare buttons (top-left stack) */}
+      <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWishlist(product.id);
+            toast.success(isWishlisted ? "أُزيل من المفضلة" : "أُضيف للمفضلة");
+          }}
+          className="w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white transition-colors shadow-sm"
+          aria-label="أضف للمفضلة"
+        >
+          <Heart
+            className={cn(
+              "w-4 h-4 transition-all",
+              isWishlisted ? "fill-burgundy text-burgundy" : "text-warm-gray"
+            )}
+          />
+        </button>
+        <button
+          onClick={handleCompare}
           className={cn(
-            "w-4 h-4 transition-all",
-            isWishlisted ? "fill-burgundy text-burgundy" : "text-warm-gray"
+            "w-9 h-9 rounded-full backdrop-blur flex items-center justify-center transition-colors shadow-sm",
+            isComparing
+              ? "bg-burgundy text-white"
+              : "bg-white/80 hover:bg-white text-warm-gray"
           )}
-        />
-      </button>
+          aria-label="أضف للمقارنة"
+          title="أضف للمقارنة"
+        >
+          <GitCompare className="w-4 h-4" />
+        </button>
+      </div>
 
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-cream-dark">
@@ -168,3 +197,4 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     </motion.div>
   );
 }
+

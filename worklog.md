@@ -418,3 +418,120 @@ Generating 34 jewelry images via z-ai-web-dev-sdk (hero, 4 categories, 3 brand, 
 
 
 
+
+---
+
+## Task ID: 10 — Cron Round 4: Missing Images + Product Compare + Address Book + Gift Cards + Styling Polish (Completed by main agent)
+
+**Trigger:** Recurring cron job (webDevReview)
+
+**Work Log:**
+
+### QA Findings & Critical Bug Fixed
+1. **CRITICAL: 18 missing product images** — All necklaces (8 images) and rings (8 images) plus 2 bracelet variants were showing 404 errors. Root cause: previous image generation scripts kept dying due to SDK 429 rate limits crashing the sequential loop.
+   - **Fix**: Created `.zscripts/gen-one-retry.ts` with exponential backoff retry logic (5 retries, 8s/16s/24s/32s/40s waits on 429). Generated all 18 missing images in 7 batches of 2-3 concurrent processes.
+   - **Result**: All 27 product images now exist. Zero 404s in dev.log. Verified necklace and ring detail pages render correctly.
+
+### New Features Added
+
+#### 1. Product Comparison Feature (compare up to 3 products)
+- **Store additions**: `compareList: string[]` (max 3), `toggleCompare`, `clearCompare`, `removeFromCompare` — persisted to localStorage
+- **ProductCard enhancement**: Added compare button (GitCompare icon) in the top-left button stack, next to wishlist. Active state shows burgundy fill. Toast feedback with count "(2/3)". Warns when max reached.
+- **CompareBar component** (NEW `src/components/glimoka/CompareBar.tsx`): Floating bottom bar appears when compareList has items. Shows product thumbnails with remove (X) buttons, empty slot placeholders, count "(2/3)", "مسح الكل" clear button, and "مقارنة" CTA (disabled until 2+ products). Spring-animated entrance.
+- **CompareView** (NEW `src/components/glimoka/views/CompareView.tsx`): Full comparison page with:
+  - Sticky label column + product columns (responsive grid)
+  - 15 comparison rows: price, discount, rating, category, metals (with color dots), color, personalizable, fonts count, sizes count, gift box price, gift card price, stock, bestseller, new, short description
+  - Per-product actions: add to cart, wishlist toggle, view details
+  - Empty state with CTA to browse products
+  - Hint about 3-product max
+- **Verified**: Added 2 products to compare → compare bar appeared → clicked compare → full comparison table rendered with all specs ✓
+
+#### 2. Customer Address Book Management
+- **Store additions**: `SavedAddress` interface (id, label, fullName, phone, governorate, city, address, notes, isDefault), `addresses: SavedAddress[]`, `selectedAddressId`, `addAddress`, `updateAddress`, `removeAddress`, `setSelectedAddress` — persisted
+- **AddressBook component** (NEW `src/components/glimoka/AddressBook.tsx`): Full CRUD interface:
+  - Grid of address cards with label icon (Home/Briefcase/MapPin), full name, phone, governorate/city, detailed address, notes
+  - "افتراضي" (Default) badge, color-coded selected state
+  - Per-address actions: set as default, edit, delete
+  - Empty state with CTA
+  - Form dialog with: label selector (3 types), full name, phone (Egyptian format validation 01XXXXXXXXX), governorate dropdown (all 29 governorates), city, detailed address textarea, notes, default checkbox
+  - Animated cards with framer-motion
+- **AccountView integration**: Added "العناوين" tab (5th tab, grid changed from 4 to 5 columns)
+- **Verified**: Opened address book → added "المنزل" address for "أحمد محمد" in Cairo → saved → card appeared with "تعيين افتراضي" button ✓
+
+#### 3. Gift Card Purchase Flow
+- **Store additions**: `GiftCardItem` interface (id, amount, recipientName, recipientEmail, senderName, message, design), `giftCards: GiftCardItem[]`, `addGiftCard`, `removeGiftCard` — persisted. `calcGiftCardsTotal()` helper, `GIFT_CARD_PRESETS` (250-2500 EGP), `GIFT_CARD_DESIGNS` (4 designs: classic/rose/burgundy/royal with colors). `clearCart` now also clears gift cards.
+- **GiftCardsView** (NEW `src/components/glimoka/views/GiftCardsView.tsx`): Full gift card designer:
+  - Hero section with animated gift icon
+  - Amount selection: 6 preset buttons + custom amount input (100-5000 EGP range)
+  - Design selection: 4 visual design cards with color gradients
+  - Recipient form: name, email (with validation), sender name, personal message (200 char limit)
+  - Live preview card: shows selected design with amount, recipient, sender, message in real-time
+  - Gift cards in cart list with design thumbnail, recipient info, remove buttons
+  - Features list (digital delivery, 12-month validity, etc.)
+- **CartView integration**: Gift cards section appears after cart items showing design thumbnails, recipient info, message preview. "أضف بطاقة هدية" dashed CTA button. Gift cards total line in order summary.
+- **Header/Footer**: Added "بطاقات الهدايا" nav link in desktop nav, mobile menu, and footer
+- **Verified**: Filled recipient "سارة" + email → clicked add → "بطاقات في السلة (1)" appeared → went to cart → gift card displayed with design thumbnail ✓
+
+#### 4. Styling Polish (Mandatory)
+- **New CSS utilities** (globals.css):
+  - `shimmer-sweep`: animated light sweep effect for promo banners
+  - `card-luxury-hover`: spring-based lift + scale on hover (cubic-bezier)
+  - `heading-ornament`: rose-gold underline ornament for section headings
+  - `diamond-pattern`: subtle diamond background pattern
+  - `text-shadow-luxury`: layered text shadow for hero
+  - `gradient-border`: masked gradient border effect
+  - `confetti-piece`: celebration confetti animation
+  - `animate-bounce-subtle`, `animate-scale-in`, `animate-slide-in-right` micro-animations
+- **HomeView enhancements**:
+  - "Why GLIMOKA" trust section: 4 feature cards (authentic materials, hand engraving, fast shipping, easy returns) with colored icons, hover lift effect, group scale
+  - Stats bar: burgundy gradient with diamond pattern overlay, 4 animated stats (5000+ customers, 4.8★ rating, 12K+ pieces, 24/7 support)
+  - Gift cards promo banner: gradient (burgundy→rose-gold) with shimmer sweep, animated gift icon that rotates on hover
+- **ProductCard**: Compare button added to button stack with active/inactive states
+
+### Files Modified/Created
+- `src/lib/store.ts` — Added compareList, addresses, giftCards state + actions, SavedAddress/GiftCardItem types, calcGiftCardsTotal, GIFT_CARD_PRESETS, GIFT_CARD_DESIGNS, persisted new fields
+- `src/components/glimoka/ProductCard.tsx` — Compare button in action stack
+- `src/components/glimoka/CompareBar.tsx` — NEW: Floating compare bar
+- `src/components/glimoka/views/CompareView.tsx` — NEW: Comparison table view
+- `src/components/glimoka/AddressBook.tsx` — NEW: Address CRUD component
+- `src/components/glimoka/views/GiftCardsView.tsx` — NEW: Gift card designer page
+- `src/components/glimoka/views/CartView.tsx` — Gift cards section + summary line
+- `src/components/glimoka/views/AccountView.tsx` — Added addresses tab (5th)
+- `src/components/glimoka/views/HomeView.tsx` — Why GLIMOKA section, stats bar, gift cards promo banner
+- `src/components/glimoka/Header.tsx` — Gift cards nav link (desktop + mobile)
+- `src/components/glimoka/Footer.tsx` — Gift cards footer link
+- `src/app/page.tsx` — Added CompareView, GiftCardsView, CompareBar
+- `src/app/globals.css` — 8 new utility classes + animations
+- `.zscripts/gen-one-retry.ts` — NEW: Image generation with retry logic
+- `.zscripts/gen-parallel.sh` — Updated parallel generation script
+
+### Verification Results
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime/console errors
+- ✅ No 404s in dev.log (all 27 product images load)
+- ✅ Product compare: added 2 products → bar appeared → compare view rendered full table
+- ✅ Gift cards: filled form → added to cart → cart shows gift card with design
+- ✅ Address book: added address → saved → card displayed with actions
+- ✅ Checkout flow still works (3-step form intact)
+- ✅ All necklace/ring detail pages now show real images
+- ✅ Home page: trust section, stats bar, promo banner all render
+- ✅ Mobile menu + all existing features still working
+
+### Image Generation Status
+- ✅ Hero + 4 categories + 3 brand images: Complete (7/7)
+- ✅ Product images: **Complete (27/27)** — all necklaces, rings, and bracelet variants generated
+- Total: 34/34 images ✅
+
+### Admin Dashboard (unchanged from Round 3)
+6 tabs: Orders, Products, Inventory, Coupons, Reviews, Reports — all still functional
+
+### Next Phase Recommendations
+1. Integrate gift cards into checkout order creation (POST /api/orders should accept giftCards)
+2. Add gift card redemption code system (generate codes that apply as payment method)
+3. Add abandoned cart recovery with WhatsApp reminders
+4. Add product reviews with photo upload
+5. Add email notification templates (order confirmation, gift card delivery)
+6. Add recently viewed section improvements (clear button, time-based)
+7. Add advanced search filters (by metal, size with URL hash params)
+8. Add customer wishlist sharing (generate shareable link)
+

@@ -17,7 +17,9 @@ export type ViewName =
   | "track-order"
   | "shipping-policy"
   | "return-policy"
-  | "size-guide";
+  | "size-guide"
+  | "compare"
+  | "gift-cards";
 
 export interface CartItemCustomization {
   metal: string;
@@ -49,6 +51,28 @@ export interface AppliedCoupon {
   minOrder: number;
 }
 
+export interface SavedAddress {
+  id: string;
+  label: string; // "المنزل", "العمل"
+  fullName: string;
+  phone: string;
+  governorate: string;
+  city: string;
+  address: string;
+  notes?: string;
+  isDefault: boolean;
+}
+
+export interface GiftCardItem {
+  id: string;
+  amount: number; // EGP value
+  recipientName: string;
+  recipientEmail: string;
+  senderName: string;
+  message: string;
+  design: string; // "classic" | "rose" | "burgundy"
+}
+
 interface ShopState {
   // Navigation
   view: ViewName;
@@ -77,6 +101,16 @@ interface ShopState {
   loyaltyBalance: number;
   useLoyaltyPoints: boolean;
 
+  // Compare
+  compareList: string[]; // productIds (max 3)
+
+  // Addresses
+  addresses: SavedAddress[];
+  selectedAddressId: string | null;
+
+  // Gift cards in cart
+  giftCards: GiftCardItem[];
+
   // Actions
   setView: (view: ViewName, opts?: { slug?: string; category?: string }) => void;
   openProduct: (slug: string) => void;
@@ -91,6 +125,18 @@ interface ShopState {
 
   toggleWishlist: (productId: string) => void;
   addRecentlyViewed: (productId: string) => void;
+
+  toggleCompare: (productId: string) => void;
+  clearCompare: () => void;
+  removeFromCompare: (productId: string) => void;
+
+  addAddress: (a: Omit<SavedAddress, "id">) => void;
+  updateAddress: (id: string, a: Partial<Omit<SavedAddress, "id">>) => void;
+  removeAddress: (id: string) => void;
+  setSelectedAddress: (id: string | null) => void;
+
+  addGiftCard: (g: Omit<GiftCardItem, "id">) => void;
+  removeGiftCard: (id: string) => void;
 
   setMobileMenuOpen: (v: boolean) => void;
   setCartDrawerOpen: (v: boolean) => void;
@@ -137,6 +183,11 @@ export const useShopStore = create<ShopState>()(
 
       loyaltyBalance: 0,
       useLoyaltyPoints: false,
+
+      compareList: [],
+      addresses: [],
+      selectedAddressId: null,
+      giftCards: [],
 
       setView: (view, opts) => {
         set({
@@ -188,7 +239,7 @@ export const useShopStore = create<ShopState>()(
       removeFromCart: (id) =>
         set({ items: get().items.filter((i) => i.id !== id) }),
 
-      clearCart: () => set({ items: [], coupon: null }),
+      clearCart: () => set({ items: [], coupon: null, giftCards: [] }),
 
       applyCoupon: (c) => set({ coupon: c }),
       removeCoupon: () => set({ coupon: null }),
@@ -206,6 +257,55 @@ export const useShopStore = create<ShopState>()(
         const r = get().recentlyViewed.filter((id) => id !== productId);
         set({ recentlyViewed: [productId, ...r].slice(0, 8) });
       },
+
+      toggleCompare: (productId) => {
+        const c = get().compareList;
+        if (c.includes(productId)) {
+          set({ compareList: c.filter((id) => id !== productId) });
+        } else {
+          if (c.length >= 3) {
+            // replace oldest
+            set({ compareList: [...c.slice(1), productId] });
+          } else {
+            set({ compareList: [...c, productId] });
+          }
+        }
+      },
+      clearCompare: () => set({ compareList: [] }),
+      removeFromCompare: (productId) =>
+        set({ compareList: get().compareList.filter((id) => id !== productId) }),
+
+      addAddress: (a) => {
+        const id = `addr_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        const newAddr: SavedAddress = { ...a, id };
+        const existing = get().addresses;
+        // if new is default, unset others
+        const list = a.isDefault
+          ? [newAddr, ...existing.map((x) => ({ ...x, isDefault: false }))]
+          : [newAddr, ...existing];
+        set({ addresses: list, selectedAddressId: a.isDefault ? id : get().selectedAddressId });
+      },
+      updateAddress: (id, patch) => {
+        const list = get().addresses.map((x) =>
+          x.id === id ? { ...x, ...patch } : patch.isDefault ? { ...x, isDefault: false } : x
+        );
+        set({ addresses: list });
+      },
+      removeAddress: (id) => {
+        const list = get().addresses.filter((x) => x.id !== id);
+        set({
+          addresses: list,
+          selectedAddressId: get().selectedAddressId === id ? null : get().selectedAddressId,
+        });
+      },
+      setSelectedAddress: (id) => set({ selectedAddressId: id }),
+
+      addGiftCard: (g) => {
+        const id = `gc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        set({ giftCards: [...get().giftCards, { ...g, id }] });
+      },
+      removeGiftCard: (id) =>
+        set({ giftCards: get().giftCards.filter((g) => g.id !== id) }),
 
       setMobileMenuOpen: (v) => set({ mobileMenuOpen: v }),
       setCartDrawerOpen: (v) => set({ cartDrawerOpen: v }),
@@ -232,6 +332,9 @@ export const useShopStore = create<ShopState>()(
         user: s.user,
         lastOrderNumber: s.lastOrderNumber,
         loyaltyBalance: s.loyaltyBalance,
+        compareList: s.compareList,
+        addresses: s.addresses,
+        giftCards: s.giftCards,
       }),
     }
   )
@@ -266,6 +369,19 @@ export function calcShipping(
   if (major.some((g) => governorate.includes(g))) return 40;
   return 50;
 }
+
+export function calcGiftCardsTotal(cards: GiftCardItem[]): number {
+  return cards.reduce((sum, g) => sum + g.amount, 0);
+}
+
+export const GIFT_CARD_PRESETS = [250, 500, 750, 1000, 1500, 2500];
+
+export const GIFT_CARD_DESIGNS = [
+  { id: "classic", name: "كلاسيكي", color: "#C9A87C" },
+  { id: "rose", name: "ذهبي وردي", color: "#E8B4B8" },
+  { id: "burgundy", name: "أحمر نبيذي", color: "#6A1B35" },
+  { id: "royal", name: "ملكي", color: "#2C3E50" },
+] as const;
 
 export const EGYPT_GOVERNORATES = [
   "القاهرة",
