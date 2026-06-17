@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/admin/reports?type=sales-by-category|sales-by-day|top-customers
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type") || "sales-by-category";
   const days = Number(searchParams.get("days") || 30);

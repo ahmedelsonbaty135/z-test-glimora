@@ -78,6 +78,34 @@ export default function Home() {
     }
   }, [setView]);
 
+  // Secret admin access via URL hash (#admin) — not linked anywhere public
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const checkAdminHash = () => {
+      if (window.location.hash === "#admin" || window.location.hash === "#/admin") {
+        setView("admin");
+        // Clean the hash for security
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    };
+    checkAdminHash();
+    window.addEventListener("hashchange", checkAdminHash);
+    return () => window.removeEventListener("hashchange", checkAdminHash);
+  }, [setView]);
+
+  // Secret admin keyboard shortcut: Ctrl+Shift+A
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+        e.preventDefault();
+        setView("admin");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [setView]);
+
   const renderView = () => {
     switch (view) {
       case "home":

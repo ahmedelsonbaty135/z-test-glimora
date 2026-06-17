@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/admin/reviews — list all reviews (with product info) for moderation
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status"); // "pending" | "approved" | "all"
 
@@ -28,6 +32,9 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/admin/reviews — approve/reject (id + isApproved in body)
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const { id, isApproved } = await req.json();
   if (!id) {
     return NextResponse.json({ error: "معرف المراجعة مطلوب" }, { status: 400 });
@@ -60,6 +67,9 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/admin/reviews?id=...
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) {

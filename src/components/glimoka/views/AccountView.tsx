@@ -158,13 +158,6 @@ export function AccountView() {
               بياناتك آمنة معنا. يمكن أيضًا تصفح الطلبات برقم الهاتف بدون تسجيل.
             </p>
           </form>
-
-          <div className="mt-6 bg-cream-dark/50 rounded-xl p-4 text-center">
-            <p className="text-sm text-warm-gray mb-2">لديك حساب إداري؟</p>
-            <Button onClick={() => setView("admin")} variant="outline" className="border-burgundy text-burgundy">
-              دخول لوحة الإدارة
-            </Button>
-          </div>
         </div>
       </div>
     );

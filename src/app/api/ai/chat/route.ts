@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import ZAI from "z-ai-web-dev-sdk";
+import { rateLimit, getClientIP } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,6 +14,12 @@ const SYSTEM_PROMPT = `أنت "جليمي" — مساعد الذكاء الاص�
 
 // POST /api/ai/chat  { message, history? }
 export async function POST(req: NextRequest) {
+  // Rate limit: 20 messages per minute per IP
+  const ip = getClientIP(req);
+  if (!rateLimit(ip, 20, 60000)) {
+    return NextResponse.json({ error: "رسائل كثيرة جدًا، حاول لاحقًا" }, { status: 429 });
+  }
+
   const { message, history = [] } = (await req.json()) as {
     message: string;
     history?: { role: "user" | "assistant"; content: string }[];

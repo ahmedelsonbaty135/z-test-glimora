@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { rateLimit, getClientIP } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // POST /api/coupons/apply  { code, subtotal }
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 attempts per minute per IP (prevent coupon brute-force)
+  const ip = getClientIP(req);
+  if (!rateLimit(ip, 10, 60000)) {
+    return NextResponse.json({ error: "محاولات كثيرة جدًا، حاول لاحقًا" }, { status: 429 });
+  }
+
   const { code, subtotal } = await req.json();
   if (!code) {
     return NextResponse.json({ error: "أدخل كود الخصم" }, { status: 400 });

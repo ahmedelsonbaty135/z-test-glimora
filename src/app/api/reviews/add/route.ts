@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { rateLimit, getClientIP, sanitizeInput } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // POST /api/reviews/add
 export async function POST(req: NextRequest) {
+  // Rate limit: 3 reviews per minute per IP
+  const ip = getClientIP(req);
+  if (!rateLimit(ip, 3, 60000)) {
+    return NextResponse.json({ error: "مراجعات كثيرة جدًا، حاول لاحقًا" }, { status: 429 });
+  }
+
   const body = await req.json();
   const { productId, authorName, rating, title, body: reviewBody, photos } = body as {
     productId: string;
@@ -20,6 +27,10 @@ export async function POST(req: NextRequest) {
   }
   if (rating < 1 || rating > 5) {
     return NextResponse.json({ error: "التقييم من 1 إلى 5" }, { status: 400 });
+  }
+  // Validate body length
+  if (String(reviewBody).length > 2000) {
+    return NextResponse.json({ error: "المراجعة طويلة جدًا (حد 2000 حرف)" }, { status: 400 });
   }
 
   // Validate photos (max 3, base64 data URLs, limit size to avoid DB bloat)
@@ -37,11 +48,11 @@ export async function POST(req: NextRequest) {
 
   const review = await db.review.create({
     data: {
-      productId,
-      authorName,
-      rating,
-      title: title || null,
-      body: reviewBody,
+      productId: String(productId).slice(0, 100),
+      authorName: sanitizeInput(String(authorName)).slice(0, 100),
+      rating: Math.min(5, Math.max(1, Number(rating))),
+      title: title ? sanitizeInput(String(title)).slice(0, 200) : null,
+      body: sanitizeInput(String(reviewBody)).slice(0, 2000),
       photosJson,
       isApproved: true, // auto-approve in sandbox; PRD says admin approval
     },

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, X, Star, Trash2, MessageSquare } from "lucide-react";
 import { cn, formatEGP } from "@/lib/utils";
 import { toast } from "sonner";
+import { adminFetch } from "@/lib/admin-client";
 
 interface AdminReview {
   id: string;
@@ -31,7 +32,7 @@ export function AdminReviews() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/reviews?status=${filter}`);
+      const res = await adminFetch(`/api/admin/reviews?status=${filter}`);
       const data = await res.json();
       setReviews(data.reviews || []);
     } finally {
@@ -46,7 +47,7 @@ export function AdminReviews() {
   const handleAction = async (id: string, action: "approve" | "reject" | "delete") => {
     if (action === "delete") {
       if (!confirm("هل أنت متأكد من حذف هذه المراجعة؟")) return;
-      const res = await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/reviews?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("تم حذف المراجعة");
         load();
@@ -54,7 +55,7 @@ export function AdminReviews() {
       return;
     }
     const isApproved = action === "approve";
-    const res = await fetch("/api/admin/reviews", {
+    const res = await adminFetch("/api/admin/reviews", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, isApproved }),

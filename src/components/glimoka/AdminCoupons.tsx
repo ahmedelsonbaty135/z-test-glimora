@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, X, Tag, CheckCircle2, XCircle } from "lucide-react";
 import { formatEGP, cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { adminFetch } from "@/lib/admin-client";
 
 interface Coupon {
   id: string;
@@ -55,7 +56,7 @@ export function AdminCoupons() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/coupons");
+      const res = await adminFetch("/api/admin/coupons");
       const data = await res.json();
       setCoupons(data.coupons || []);
     } finally {
@@ -69,7 +70,7 @@ export function AdminCoupons() {
 
   const handleDelete = async (id: string, code: string) => {
     if (!confirm(`هل أنت متأكد من حذف كوبون "${code}"؟`)) return;
-    const res = await fetch(`/api/admin/coupons?id=${id}`, { method: "DELETE" });
+    const res = await adminFetch(`/api/admin/coupons?id=${id}`, { method: "DELETE" });
     if (res.ok) {
       toast.success("تم حذف الكوبون");
       load();
@@ -79,7 +80,7 @@ export function AdminCoupons() {
   };
 
   const toggleActive = async (c: Coupon) => {
-    const res = await fetch("/api/admin/coupons", {
+    const res = await adminFetch("/api/admin/coupons", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: c.id, isActive: !c.isActive }),
@@ -301,7 +302,7 @@ function CouponFormDialog({
       };
       if (coupon) {
         body.id = coupon.id;
-        const res = await fetch("/api/admin/coupons", {
+        const res = await adminFetch("/api/admin/coupons", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -314,7 +315,7 @@ function CouponFormDialog({
           toast.error(d.error || "فشل التحديث");
         }
       } else {
-        const res = await fetch("/api/admin/coupons", {
+        const res = await adminFetch("/api/admin/coupons", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),

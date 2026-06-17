@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/admin/coupons — list all coupons
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const coupons = await db.coupon.findMany({
-    include: { _count: { select: { usages: true } } },
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json({ coupons });
@@ -14,6 +17,9 @@ export async function GET() {
 
 // POST /api/admin/coupons — create a new coupon
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const body = await req.json();
   const {
     code, type, value, minOrder, maxDiscount, usageLimit, perCustomerLimit,
@@ -49,6 +55,9 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/admin/coupons — update a coupon (id in body)
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const body = await req.json();
   const { id, ...updates } = body;
 
@@ -78,6 +87,9 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/admin/coupons?id=...
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) {

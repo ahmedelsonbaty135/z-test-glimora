@@ -36,6 +36,9 @@ import {
   Search,
   ArrowLeft,
   Star,
+  FolderTree,
+  Image as ImageIcon,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -57,6 +60,16 @@ import { AdminProducts } from "../AdminProducts";
 import { AdminCoupons } from "../AdminCoupons";
 import { AdminReviews } from "../AdminReviews";
 import { AdminReports } from "../AdminReports";
+import { AdminCategories } from "../AdminCategories";
+import { AdminBanners } from "../AdminBanners";
+import { AdminSettings } from "../AdminSettings";
+import {
+  setAdminCode,
+  clearAdminCode,
+  isAuthenticated,
+  adminFetch,
+  verifyAdminCode,
+} from "@/lib/admin-client";
 
 interface AdminStats {
   kpis: {
@@ -77,18 +90,20 @@ interface AdminStats {
 }
 
 export function AdminView() {
-  const { user, login, logout, setView } = useShopStore();
+  const { setView } = useShopStore();
   const [authed, setAuthed] = useState(false);
   const [pass, setPass] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [orderFilter, setOrderFilter] = useState("");
 
-  const isAdmin = user?.role === "ADMIN";
-
+  // Check if already authenticated (sessionStorage)
   useEffect(() => {
-    if (isAdmin) setAuthed(true);
-  }, [isAdmin]);
+    if (isAuthenticated()) {
+      setAuthed(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (authed) loadStats();
@@ -97,11 +112,47 @@ export function AdminView() {
   const loadStats = async () => {
     setLoading(true);
     try {
-      const d = await fetch("/api/admin/stats").then((r) => r.json());
+      const res = await adminFetch("/api/admin/stats");
+      if (!res.ok) {
+        if (res.status === 401) {
+          setAuthed(false);
+          clearAdminCode();
+          toast.error("انتهت الجلسة — أدخل الكود مرة أخرى");
+        }
+        return;
+      }
+      const d = await res.json();
       setStats(d);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pass.trim()) {
+      toast.error("أدخل كود الأدمن");
+      return;
+    }
+    setVerifying(true);
+    const valid = await verifyAdminCode(pass.trim());
+    setVerifying(false);
+    if (valid) {
+      setAdminCode(pass.trim());
+      setAuthed(true);
+      setPass("");
+      toast.success("مرحبًا أيها المدير!");
+    } else {
+      toast.error("كود الأدمن غير صحيح");
+    }
+  };
+
+  const handleLogout = () => {
+    clearAdminCode();
+    setAuthed(false);
+    setStats(null);
+    toast.success("تم تسجيل الخروج");
+    setView("home");
   };
 
   if (!authed) {
@@ -109,39 +160,40 @@ export function AdminView() {
       <div className="container mx-auto px-4 py-12 lg:py-20">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-burgundy-gradient mx-auto flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-full bg-burgundy-gradient mx-auto flex items-center justify-center mb-4 shadow-luxury-lg">
               <Lock className="w-8 h-8 text-rose-gold-light" />
             </div>
             <h1 className="text-2xl font-black text-warm-black">لوحة تحكم GLIMOKA</h1>
             <p className="text-warm-gray text-sm mt-1">منطقة محمية — للمسؤولين فقط</p>
           </div>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (pass === "admin" || pass === "glimoka") {
-                login("admin@glimoka.com", "GLIMOKA Admin", "ADMIN");
-                setAuthed(true);
-                toast.success("مرحبًا أيها المدير!");
-              } else {
-                toast.error("كلمة مرور خاطئة. جرّب: admin");
-              }
-            }}
-            className="space-y-4 bg-white rounded-2xl border border-rose-gold/20 p-6"
+            onSubmit={handleLogin}
+            className="space-y-4 bg-white rounded-2xl border border-rose-gold/20 p-6 shadow-luxury"
           >
             <div>
-              <label className="text-sm font-bold">كلمة مرور الإدارة</label>
+              <label className="text-sm font-bold text-warm-black">كود الأدمن السري</label>
               <Input
                 type="password"
                 value={pass}
                 onChange={(e) => setPass(e.target.value)}
-                placeholder="••••••••"
+                placeholder="••••••••••••"
                 dir="ltr"
-                className="mt-1 text-right"
+                className="mt-1 text-right border-rose-gold/30 focus:border-burgundy"
                 autoFocus
+                disabled={verifying}
               />
-              <p className="text-xs text-warm-gray mt-1">للتجربة استخدم: <code className="bg-cream-dark px-1 rounded">admin</code></p>
+              <p className="text-xs text-warm-gray mt-2 flex items-center gap-1">
+                <Lock className="w-3 h-3" />
+                الكود السري يُطلب من إدارة المتجر فقط
+              </p>
             </div>
-            <Button type="submit" className="w-full bg-burgundy hover:bg-burgundy-deep h-11">دخول لوحة الإدارة</Button>
+            <Button
+              type="submit"
+              className="w-full bg-burgundy hover:bg-burgundy-deep h-11"
+              disabled={verifying}
+            >
+              {verifying ? "جارٍ التحقق..." : "دخول لوحة الإدارة"}
+            </Button>
           </form>
           <Button onClick={() => setView("home")} variant="ghost" className="w-full mt-4 text-warm-gray">
             <ArrowLeft className="w-4 h-4 ml-1" />
@@ -189,7 +241,7 @@ export function AdminView() {
             <Button onClick={() => setView("home")} variant="outline" size="sm" className="border-burgundy text-burgundy">
               عرض المتجر
             </Button>
-            <Button onClick={() => { logout(); setAuthed(false); setView("home"); }} variant="outline" size="sm" className="border-danger-soft text-danger-soft">
+            <Button onClick={handleLogout} variant="outline" size="sm" className="border-danger-soft text-danger-soft">
               <LogOut className="w-4 h-4 ml-1" />
               خروج
             </Button>
@@ -303,10 +355,13 @@ export function AdminView() {
           <TabsList className="bg-cream-dark flex-wrap h-auto">
             <TabsTrigger value="orders"><ShoppingCart className="w-4 h-4 ml-1" /> الطلبات</TabsTrigger>
             <TabsTrigger value="products"><Package className="w-4 h-4 ml-1" /> المنتجات</TabsTrigger>
+            <TabsTrigger value="categories"><FolderTree className="w-4 h-4 ml-1" /> الفئات</TabsTrigger>
             <TabsTrigger value="alerts"><AlertTriangle className="w-4 h-4 ml-1" /> المخزون</TabsTrigger>
             <TabsTrigger value="coupons"><Tag className="w-4 h-4 ml-1" /> الكوبونات</TabsTrigger>
             <TabsTrigger value="reviews"><Star className="w-4 h-4 ml-1" /> المراجعات</TabsTrigger>
+            <TabsTrigger value="banners"><ImageIcon className="w-4 h-4 ml-1" /> البانرات</TabsTrigger>
             <TabsTrigger value="reports"><TrendingUp className="w-4 h-4 ml-1" /> التقارير</TabsTrigger>
+            <TabsTrigger value="settings"><SettingsIcon className="w-4 h-4 ml-1" /> الإعدادات</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders">
@@ -361,9 +416,8 @@ export function AdminView() {
                                   value={o.status}
                                   onValueChange={async (v) => {
                                     try {
-                                      const res = await fetch(`/api/admin/orders/${o.id}/status`, {
+                                      const res = await adminFetch(`/api/admin/orders/${o.id}/status`, {
                                         method: "PATCH",
-                                        headers: { "Content-Type": "application/json" },
                                         body: JSON.stringify({ status: v }),
                                       });
                                       if (res.ok) {
@@ -442,8 +496,20 @@ export function AdminView() {
             <AdminReviews />
           </TabsContent>
 
+          <TabsContent value="banners">
+            <AdminBanners />
+          </TabsContent>
+
           <TabsContent value="reports">
             <AdminReports />
+          </TabsContent>
+
+          <TabsContent value="categories">
+            <AdminCategories />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <AdminSettings />
           </TabsContent>
         </Tabs>
       </div>

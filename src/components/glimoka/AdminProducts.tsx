@@ -24,6 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Pencil, Trash2, X, Search, Star } from "lucide-react";
 import { formatEGP, cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { adminFetch } from "@/lib/admin-client";
 
 interface AdminProduct {
   id: string;
@@ -63,7 +64,7 @@ export function AdminProducts() {
     setLoading(true);
     try {
       const [prodRes, catRes] = await Promise.all([
-        fetch("/api/admin/products"),
+        adminFetch("/api/admin/products"),
         fetch("/api/categories"),
       ]);
       const prodData = await prodRes.json();
@@ -81,7 +82,7 @@ export function AdminProducts() {
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
-    const res = await fetch(`/api/admin/products?id=${id}`, { method: "DELETE" });
+    const res = await adminFetch(`/api/admin/products?id=${id}`, { method: "DELETE" });
     if (res.ok) {
       toast.success("تم حذف المنتج");
       load();
@@ -295,7 +296,7 @@ function ProductFormDialog({
       if (product) {
         // Update
         body.id = product.id;
-        const res = await fetch("/api/admin/products", {
+        const res = await adminFetch("/api/admin/products", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -309,7 +310,7 @@ function ProductFormDialog({
         }
       } else {
         // Create
-        const res = await fetch("/api/admin/products", {
+        const res = await adminFetch("/api/admin/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),

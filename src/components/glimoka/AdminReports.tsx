@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { TrendingUp, Package, Users, BarChart3 } from "lucide-react";
 import { formatEGP } from "@/lib/utils";
+import { adminFetch } from "@/lib/admin-client";
 
 const COLORS = ["#6A1B35", "#C9A87C", "#8B3A4F", "#10B981", "#9B2C2C", "#7C3AED"];
 
@@ -35,7 +36,7 @@ export function AdminReports() {
     Promise.resolve().then(() => {
       if (cancelled) return;
       setLoading(true);
-      fetch(`/api/admin/reports?type=${reportType}&days=${days}`)
+      adminFetch(`/api/admin/reports?type=${reportType}&days=${days}`)
         .then((r) => r.json())
         .then((d) => {
           if (!cancelled) setData(d.report || []);
