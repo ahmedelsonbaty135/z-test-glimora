@@ -55,6 +55,24 @@ export function ProductsView() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const fetchProducts = useCallback(async () => {
+    // If there's a search query, use semantic search endpoint for smarter matching
+    if (searchQuery && !selectedCategory) {
+      const semRes = await fetch(`/api/search/semantic?q=${encodeURIComponent(searchQuery)}`);
+      const semData = await semRes.json();
+      let list: ProductCardData[] = semData.products || [];
+      // Apply remaining filters
+      if (metals.length > 0) {
+        list = list.filter((p) => metals.includes((p as any).material));
+      }
+      if (minRating > 0) list = list.filter((p) => p.rating >= minRating);
+      if (onSaleOnly) list = list.filter((p) => p.isOnSale);
+      list = list.filter((p) => p.basePrice >= priceRange[0] && p.basePrice <= priceRange[1]);
+      setProducts(list);
+      setVisibleCount(PAGE_SIZE);
+      setLoading(false);
+      return;
+    }
+
     const params = new URLSearchParams();
     if (selectedCategory) params.set("category", selectedCategory);
     if (searchQuery) params.set("q", searchQuery);

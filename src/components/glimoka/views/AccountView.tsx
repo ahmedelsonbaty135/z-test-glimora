@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingBag, Phone, Mail, Gift, ArrowLeft, Search } from "lucide-react";
+import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingBag, Phone, Mail, Gift, ArrowLeft, Search, RotateCw } from "lucide-react";
 import { ProductCard, type ProductCardData } from "../ProductCard";
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ interface Order {
 }
 
 export function AccountView() {
-  const { user, login, logout, setView, wishlist, toggleWishlist, openProduct, items, addToCart } = useShopStore();
+  const { user, login, logout, setView, wishlist, toggleWishlist, openProduct, items, addToCart, loyaltyBalance } = useShopStore();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [orders, setOrders] = useState<Order[]>([]);
@@ -259,7 +259,43 @@ export function AccountView() {
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-rose-gold/15">
                     <span className="text-sm text-warm-gray">{o.items.reduce((s, i) => s + i.quantity, 0)} منتج</span>
-                    <span className="font-bold text-burgundy">{formatEGP(o.total)}</span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs border-burgundy text-burgundy hover:bg-burgundy hover:text-white"
+                        onClick={() => {
+                          // Re-order: add all items back to cart
+                          o.items.forEach((it) => {
+                            addToCart({
+                              productId: it.id,
+                              slug: "",
+                              name: it.name,
+                              image: it.image,
+                              basePrice: it.price,
+                              unitPrice: it.price,
+                              quantity: it.quantity,
+                              customization: {
+                                metal: it.metal || "SILVER_925",
+                                size: it.size || "17",
+                                font: "خط عربي تقليدي",
+                                name1: it.name1 || "",
+                                name2: it.name2 || "",
+                                giftBox: false,
+                                giftCard: "",
+                              },
+                              maxStock: 99,
+                            } as any);
+                          });
+                          toast.success(`تمت إضافة ${o.items.length} منتج للسلة`);
+                          setView("cart");
+                        }}
+                      >
+                        <RotateCw className="w-3 h-3 ml-1" />
+                        إعادة الطلب
+                      </Button>
+                      <span className="font-bold text-burgundy">{formatEGP(o.total)}</span>
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -316,7 +352,7 @@ export function AccountView() {
                 <p className="font-bold text-warm-black text-sm">نقاط الولاء</p>
                 <p className="text-xs text-warm-gray">اكسب نقطة لكل 10 ج.م — استبدلها بخصومات</p>
               </div>
-              <span className="mr-auto font-black text-burgundy text-xl">{orders.reduce((s, o) => s + Math.floor(o.total / 10), 0)}</span>
+              <span className="mr-auto font-black text-burgundy text-xl">{loyaltyBalance}</span>
             </div>
           </div>
         </TabsContent>

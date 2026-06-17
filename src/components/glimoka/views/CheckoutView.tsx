@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useShopStore, calcSubtotal, calcDiscount, calcShipping, EGYPT_GOVERNORATES } from "@/lib/store";
+import { calcLoyaltyDiscount, calcLoyaltyEarn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +20,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 
 export function CheckoutView() {
-  const { items, setView, coupon, clearCart, setLastOrder, user, login } = useShopStore();
+  const { items, setView, coupon, clearCart, setLastOrder, user, login, loyaltyBalance, useLoyaltyPoints, addLoyalty } = useShopStore();
   const [form, setForm] = useState({
     guestName: user?.name || "",
     guestPhone: "",
@@ -32,7 +33,9 @@ export function CheckoutView() {
   const [submitting, setSubmitting] = useState(false);
 
   const subtotal = calcSubtotal(items);
-  const discount = calcDiscount(subtotal, coupon);
+  const couponDiscount = calcDiscount(subtotal, coupon);
+  const loyaltyDiscount = calcLoyaltyDiscount(loyaltyBalance, useLoyaltyPoints, subtotal);
+  const discount = couponDiscount + loyaltyDiscount;
   const shipping = calcShipping(subtotal, form.governorate, coupon);
   const total = Math.max(0, subtotal - discount + shipping);
 
@@ -98,6 +101,14 @@ export function CheckoutView() {
       }
       // mock login as customer for tracking
       if (!user) login(form.guestEmail || form.guestPhone, form.guestName, "CUSTOMER");
+      // Deduct used loyalty points and add newly earned points
+      if (useLoyaltyPoints && loyaltyDiscount > 0) {
+        addLoyalty(-Math.floor(loyaltyDiscount));
+      }
+      const earned = calcLoyaltyEarn(total);
+      if (earned > 0) {
+        addLoyalty(earned);
+      }
       setLastOrder(data.orderNumber);
       clearCart();
       setView("thankyou");
@@ -287,10 +298,16 @@ export function CheckoutView() {
                 <span className="text-warm-gray">المجموع الفرعي</span>
                 <span className="font-semibold">{formatEGP(subtotal)}</span>
               </div>
-              {discount > 0 && (
+              {couponDiscount > 0 && (
                 <div className="flex justify-between text-emerald-soft">
-                  <span>الخصم {coupon && `(${coupon.code})`}</span>
-                  <span className="font-semibold">-{formatEGP(discount)}</span>
+                  <span>خصم الكوبون {coupon && `(${coupon.code})`}</span>
+                  <span className="font-semibold">-{formatEGP(couponDiscount)}</span>
+                </div>
+              )}
+              {loyaltyDiscount > 0 && (
+                <div className="flex justify-between text-burgundy">
+                  <span>خصم نقاط الولاء</span>
+                  <span className="font-semibold">-{formatEGP(loyaltyDiscount)}</span>
                 </div>
               )}
               <div className="flex justify-between">

@@ -73,6 +73,10 @@ interface ShopState {
   // Auth (mock — sandbox)
   user: { email: string; name: string; role: "CUSTOMER" | "ADMIN" } | null;
 
+  // Loyalty
+  loyaltyBalance: number;
+  useLoyaltyPoints: boolean;
+
   // Actions
   setView: (view: ViewName, opts?: { slug?: string; category?: string }) => void;
   openProduct: (slug: string) => void;
@@ -98,6 +102,9 @@ interface ShopState {
   login: (email: string, name: string, role?: "CUSTOMER" | "ADMIN") => void;
   logout: () => void;
   setLastOrder: (n: string) => void;
+  setLoyaltyBalance: (n: number) => void;
+  addLoyalty: (n: number) => void;
+  setUseLoyaltyPoints: (v: boolean) => void;
 }
 
 function makeLineId(item: Omit<CartItem, "id">) {
@@ -127,6 +134,9 @@ export const useShopStore = create<ShopState>()(
       quickViewSlug: null,
 
       user: null,
+
+      loyaltyBalance: 0,
+      useLoyaltyPoints: false,
 
       setView: (view, opts) => {
         set({
@@ -208,6 +218,9 @@ export const useShopStore = create<ShopState>()(
         set({ user: { email, name, role } }),
       logout: () => set({ user: null }),
       setLastOrder: (n) => set({ lastOrderNumber: n }),
+      setLoyaltyBalance: (n) => set({ loyaltyBalance: Math.max(0, n) }),
+      addLoyalty: (n) => set({ loyaltyBalance: Math.max(0, get().loyaltyBalance + n) }),
+      setUseLoyaltyPoints: (v) => set({ useLoyaltyPoints: v }),
     }),
     {
       name: "glimoka-shop",
@@ -218,6 +231,7 @@ export const useShopStore = create<ShopState>()(
         recentlyViewed: s.recentlyViewed,
         user: s.user,
         lastOrderNumber: s.lastOrderNumber,
+        loyaltyBalance: s.loyaltyBalance,
       }),
     }
   )

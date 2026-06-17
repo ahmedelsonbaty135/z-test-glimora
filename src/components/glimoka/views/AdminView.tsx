@@ -52,6 +52,7 @@ import {
 } from "recharts";
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
+import { AdminProducts } from "../AdminProducts";
 
 interface AdminStats {
   kpis: {
@@ -293,10 +294,11 @@ export function AdminView() {
           </CardContent>
         </Card>
 
-        {/* Tabs: Orders, Products, Alerts */}
+        {/* Tabs: Orders, Products, Alerts, Coupons */}
         <Tabs defaultValue="orders" className="space-y-4">
           <TabsList className="bg-cream-dark">
             <TabsTrigger value="orders"><ShoppingCart className="w-4 h-4 ml-1" /> الطلبات</TabsTrigger>
+            <TabsTrigger value="products"><Package className="w-4 h-4 ml-1" /> المنتجات</TabsTrigger>
             <TabsTrigger value="alerts"><AlertTriangle className="w-4 h-4 ml-1" /> تنبيهات المخزون</TabsTrigger>
             <TabsTrigger value="coupons"><Tag className="w-4 h-4 ml-1" /> الكوبونات</TabsTrigger>
           </TabsList>
@@ -390,6 +392,10 @@ export function AdminView() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="products">
+            <AdminProducts />
           </TabsContent>
 
           <TabsContent value="alerts">

@@ -4,21 +4,24 @@ import { useState } from "react";
 import { useShopStore, calcSubtotal, calcDiscount, calcShipping } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag, X, Truck } from "lucide-react";
-import { formatEGP } from "@/lib/utils";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag, X, Truck, Sparkles, Gift } from "lucide-react";
+import { formatEGP, calcLoyaltyDiscount, calcLoyaltyEarn } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 export function CartView() {
-  const { items, updateQty, removeFromCart, setView, coupon, applyCoupon, removeCoupon, clearCart } = useShopStore();
+  const { items, updateQty, removeFromCart, setView, coupon, applyCoupon, removeCoupon, clearCart, loyaltyBalance, useLoyaltyPoints, setUseLoyaltyPoints } = useShopStore();
   const [couponInput, setCouponInput] = useState("");
   const [applying, setApplying] = useState(false);
 
   const subtotal = calcSubtotal(items);
-  const discount = calcDiscount(subtotal, coupon);
+  const couponDiscount = calcDiscount(subtotal, coupon);
+  const loyaltyDiscount = calcLoyaltyDiscount(loyaltyBalance, useLoyaltyPoints, subtotal);
+  const discount = couponDiscount + loyaltyDiscount;
   const shipping = calcShipping(subtotal, "القاهرة", coupon);
   const total = Math.max(0, subtotal - discount + shipping);
+  const willEarn = calcLoyaltyEarn(total);
 
   const applyCouponHandler = async () => {
     if (!couponInput.trim()) return;
@@ -228,15 +231,47 @@ export function CartView() {
               </div>
             )}
 
+            {/* Loyalty redemption */}
+            {loyaltyBalance > 0 && (
+              <label className="flex items-start gap-2 p-3 rounded-lg border border-rose-gold/30 bg-rose-gold/5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useLoyaltyPoints}
+                  onChange={(e) => setUseLoyaltyPoints(e.target.checked)}
+                  className="w-4 h-4 accent-burgundy mt-0.5"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-warm-black flex items-center gap-1">
+                    <Gift className="w-3.5 h-3.5 text-burgundy" />
+                    استخدم نقاط الولاء ({loyaltyBalance} نقطة)
+                  </p>
+                  <p className="text-[11px] text-warm-gray">
+                    وفّر حتى {formatEGP(Math.min(loyaltyBalance, Math.floor(subtotal * 0.3)))} (حد أقصى 30% من الطلب)
+                  </p>
+                </div>
+                {useLoyaltyPoints && loyaltyDiscount > 0 && (
+                  <span className="text-xs font-bold text-emerald-soft bg-emerald-soft/10 px-2 py-1 rounded-full whitespace-nowrap">
+                    -{formatEGP(loyaltyDiscount)}
+                  </span>
+                )}
+              </label>
+            )}
+
             <div className="border-t border-rose-gold/20 pt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-warm-gray">المجموع الفرعي</span>
                 <span className="font-semibold text-warm-black">{formatEGP(subtotal)}</span>
               </div>
-              {discount > 0 && (
+              {couponDiscount > 0 && (
                 <div className="flex justify-between text-emerald-soft">
-                  <span>الخصم</span>
-                  <span className="font-semibold">-{formatEGP(discount)}</span>
+                  <span>خصم الكوبون {coupon && `(${coupon.code})`}</span>
+                  <span className="font-semibold">-{formatEGP(couponDiscount)}</span>
+                </div>
+              )}
+              {loyaltyDiscount > 0 && (
+                <div className="flex justify-between text-burgundy">
+                  <span className="flex items-center gap-1"><Sparkles className="w-3 h-3" /> خصم النقاط</span>
+                  <span className="font-semibold">-{formatEGP(loyaltyDiscount)}</span>
                 </div>
               )}
               <div className="flex justify-between">
@@ -257,6 +292,15 @@ export function CartView() {
               <span className="font-bold text-warm-black">الإجمالي</span>
               <span className="text-2xl font-black text-burgundy">{formatEGP(total)}</span>
             </div>
+
+            {willEarn > 0 && (
+              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-rose-gold/10 border border-rose-gold/30">
+                <Sparkles className="w-4 h-4 text-burgundy shrink-0" />
+                <p className="text-xs text-warm-black">
+                  ستحصل على <span className="font-bold text-burgundy">{willEarn} نقطة ولاء</span> من هذا الطلب (1 نقطة = 1 ج.م)
+                </p>
+              </div>
+            )}
 
             <Button onClick={() => setView("checkout")} size="lg" className="w-full bg-burgundy hover:bg-burgundy-deep h-12 text-base">
               إتمام الطلب

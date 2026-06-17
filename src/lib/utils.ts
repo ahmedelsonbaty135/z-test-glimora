@@ -79,3 +79,18 @@ export const ORDER_STATUS_META: Record<
   CANCELLED: { label: "ملغي", color: "#991B1B", bg: "#FEE2E2", step: 0 },
   RETURNED: { label: "مُرتجع", color: "#9B2C2C", bg: "#FED7D7", step: 0 },
 };
+
+// Loyalty: 1 point = 1 EGP. Earn 1 point per 10 EGP spent.
+export const LOYALTY_EARN_RATE = 10;
+export const LOYALTY_REDEEM_RATE = 1;
+
+export function calcLoyaltyEarn(total: number): number {
+  return Math.floor(total / LOYALTY_EARN_RATE);
+}
+
+export function calcLoyaltyDiscount(loyaltyBalance: number, useLoyalty: boolean, subtotal: number): number {
+  if (!useLoyalty || loyaltyBalance <= 0) return 0;
+  // Each point = 1 EGP, max 30% of subtotal
+  const maxDiscount = Math.floor(subtotal * 0.3);
+  return Math.min(loyaltyBalance, maxDiscount);
+}

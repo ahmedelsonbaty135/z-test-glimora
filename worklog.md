@@ -197,3 +197,101 @@ Generating 34 jewelry images via z-ai-web-dev-sdk (hero, 4 categories, 3 brand, 
 6. Add customer order history with re-order functionality
 7. Add email notification templates (order confirmation, shipping)
 
+---
+
+## Task ID: 8 — Cron Round 2: Loyalty System + Admin CRUD + Semantic Search + Re-order (Completed by review agent)
+
+**Trigger:** Recurring cron job (webDevReview, every 15 min)
+
+**Work Log:**
+
+### QA Findings
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime/console errors after fresh reload
+- ✅ All views render correctly (home, products, cart, checkout, admin)
+- ✅ Mobile menu, quick view, size guide all functional from Round 1
+- 🔄 Image generation continues (6/24 product images complete)
+
+### New Features Added
+
+#### 1. Loyalty Points System (Full lifecycle)
+- **Store additions**: `loyaltyBalance`, `useLoyaltyPoints`, `setLoyaltyBalance`, `addLoyalty`, `setUseLoyaltyPoints` — persisted to localStorage
+- **Utility helpers** (`src/lib/utils.ts`): `calcLoyaltyEarn()` (1 point per 10 EGP), `calcLoyaltyDiscount()` (1 point = 1 EGP, max 30% of subtotal)
+- **Cart view**: Loyalty redemption checkbox showing balance, max discount, and live discount application. Separate display of coupon discount vs loyalty discount. "Will earn X points" indicator near total.
+- **Checkout view**: Loyalty discount shown in order summary. On order completion, used points are deducted and newly earned points are added to balance.
+- **Account view**: Loyalty balance displayed from store (not recalculated from orders)
+- **Verified**: 150 points → enabled → 135 EGP discount (30% of 450) → total 345 EGP ✓
+
+#### 2. Admin Product CRUD
+- **New API**: `GET/POST/PATCH/DELETE /api/admin/products` — full CRUD with validation
+  - POST creates product with image, validates slug uniqueness
+  - PATCH updates allowed fields with type coercion
+  - DELETE removes product and its images
+- **New component**: `AdminProducts.tsx` — product management interface
+  - Product list with thumbnails, badges, stock indicators (color-coded)
+  - Search/filter by name or slug
+  - "New Product" button opens form dialog
+  - Edit (pencil) and Delete (trash) actions per product
+  - Full form dialog with: name, slug, shortDesc, description, price, comparePrice, stock, category, material, image URL, and 4 flag checkboxes (featured/bestseller/new/sale)
+- **Admin integration**: New "المنتجات" tab in admin dashboard
+- **Verified**: Created test product "سوار اختبار" → saved to DB → toast "تم إضافة المنتج" → cleaned up ✓
+
+#### 3. AI Semantic Search
+- **New API**: `GET /api/search/semantic?q=` — LLM-powered product matching
+  - First tries fast keyword matching
+  - If <3 keyword matches, uses z-ai-web-dev-sdk LLM to semantically match products (e.g., "هدية خطوبة" → engagement ring, heart necklace, dual-name bracelet)
+  - Merges keyword + semantic results, dedupes
+  - Graceful fallback to keyword-only on API errors
+- **ProductsView integration**: When searching without a category filter, uses semantic search endpoint instead of keyword-only `/api/products`
+- **Verified**: Searched "هدية خطوبة" → returned 6 relevant products (engagement ring, heart necklace, dual-name bracelet, gold pieces) ✓
+
+#### 4. Re-order from Order History
+- **AccountView**: Each order card now has a "إعادة الطلب" (Re-order) button
+  - Adds all items from the past order back to cart with their original customizations
+  - Shows toast confirmation and navigates to cart
+- **Verified**: Re-order button appears on order cards, uses original metal/size/name customizations
+
+### Styling Improvements
+- Loyalty redemption card with rose-gold accent border, gift icon, live discount badge
+- Cart summary separates coupon vs loyalty discounts with distinct colors (emerald vs burgundy)
+- "Will earn" loyalty indicator with sparkles icon in rose-gold tinted box
+- Admin products list with color-coded stock badges (red ≤10, amber ≤20, green >20)
+- Admin product form dialog with organized grid layout, flag checkboxes in 4-column grid
+- Re-order button with rotate icon in burgundy outline style
+
+### Files Modified/Created
+- `src/lib/store.ts` — Added loyalty state (loyaltyBalance, useLoyaltyPoints) + actions, persisted
+- `src/lib/utils.ts` — Added LOYALTY_EARN_RATE, LOYALTY_REDEEM_RATE, calcLoyaltyEarn, calcLoyaltyDiscount
+- `src/components/glimoka/views/CartView.tsx` — Loyalty redemption UI + summary breakdown + earn indicator
+- `src/components/glimoka/views/CheckoutView.tsx` — Loyalty discount in summary + points deduction/earning on order
+- `src/components/glimoka/views/AccountView.tsx` — Loyalty balance from store + re-order button
+- `src/components/glimoka/views/ProductsView.tsx` — Semantic search integration
+- `src/components/glimoka/views/AdminView.tsx` — Added Products tab
+- `src/components/glimoka/AdminProducts.tsx` — NEW: Admin product CRUD component with form dialog
+- `src/app/api/admin/products/route.ts` — NEW: Product CRUD API (GET/POST/PATCH/DELETE)
+- `src/app/api/search/semantic/route.ts` — NEW: AI semantic search API
+
+### Verification Results
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime errors
+- ✅ Loyalty redemption: 150 pts → 135 EGP discount → total 345 EGP (verified via agent-browser)
+- ✅ Admin product creation: "سوار اختبار" saved to DB, toast confirmed, cleaned up
+- ✅ Semantic search: "هدية خطوبة" → 6 relevant products returned
+- ✅ Re-order button appears on order history cards
+- ✅ All existing features still working (mobile menu, quick view, size guide, admin orders)
+
+### Image Generation Status
+- Hero, 4 categories, 3 brand images: ✅ Complete (7/7)
+- Product images: 6/24 complete — auto-restart wrapper continues in background
+
+### Next Phase Recommendations
+1. Complete remaining product images (18/24)
+2. Add abandoned cart recovery (WhatsApp reminder after 1h/24h)
+3. Add admin coupon CRUD (create/edit/delete coupons)
+4. Add customer address book management
+5. Add product reviews moderation in admin
+6. Add wishlist → cart move functionality
+7. Add email notification templates
+8. Add sales analytics reports (by period, category, customer)
+
+
