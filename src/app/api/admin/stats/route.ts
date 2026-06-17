@@ -50,7 +50,6 @@ export async function GET(req: NextRequest) {
   since.setDate(since.getDate() - 14);
   const recentOrdersForChart = await db.order.findMany({
     where: { createdAt: { gte: since } },
-    select: { total: true, createdAt: true },
   });
   const salesByDay: { date: string; total: number }[] = [];
   for (let i = 13; i >= 0; i--) {
@@ -58,8 +57,11 @@ export async function GET(req: NextRequest) {
     d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(0, 10);
     const total = recentOrdersForChart
-      .filter((o) => o.createdAt.toISOString().slice(0, 10) === key)
-      .reduce((s, o) => s + o.total, 0);
+      .filter((o) => {
+        const created = new Date(o.createdAt).toISOString().slice(0, 10);
+        return created === key;
+      })
+      .reduce((s, o) => s + (Number(o.total) || 0), 0);
     salesByDay.push({ date: key, total });
   }
 

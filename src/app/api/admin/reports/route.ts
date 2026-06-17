@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/admin/reports?type=sales-by-category|sales-by-day|top-customers
+// GET /api/admin/reports?type=sales-by-category|sales-by-day|top-customers|top-products
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req);
   if (auth.error) return NextResponse.json({ error: auth.error }, { status: 401 });
@@ -16,27 +16,36 @@ export async function GET(req: NextRequest) {
   const since = new Date();
   since.setDate(since.getDate() - days);
 
+  // Fetch all orders (not cancelled) with items
+  const orders = await db.order.findMany({
+    where: { createdAt: { gte: since } },
+  });
+
+  // Filter out cancelled orders client-side (Supabase doesn't support nested not easily)
+  const validOrders = orders.filter((o: any) => o.status !== "CANCELLED");
+
   if (type === "sales-by-category") {
-    // Aggregate order items by product category
-    const orders = await db.order.findMany({
-      where: { createdAt: { gte: since }, status: { not: "CANCELLED" } },
-      include: {
-        items: {
-          include: {
-            product: { select: { category: { select: { name: true } } } },
-          },
-        },
-      },
-    });
+    // Need product info for each item — fetch items separately
+    const allItems: any[] = [];
+    for (const order of validOrders) {
+      if (order.items) {
+        for (const item of order.items) {
+          allItems.push(item);
+        }
+      }
+    }
+
+    // Fetch products with categories to map items to categories
+    const products = await db.product.findMany();
+    const productMap = new Map(products.map((p: any) => [p.id, p]));
 
     const byCategory: Record<string, { revenue: number; count: number }> = {};
-    for (const order of orders) {
-      for (const item of order.items) {
-        const catName = item.product?.category?.name || "غير مصنف";
-        if (!byCategory[catName]) byCategory[catName] = { revenue: 0, count: 0 };
-        byCategory[catName].revenue += item.price * item.quantity;
-        byCategory[catName].count += item.quantity;
-      }
+    for (const item of allItems) {
+      const product = productMap.get(item.productId);
+      const catName = product?.category?.name || "غير مصنف";
+      if (!byCategory[catName]) byCategory[catName] = { revenue: 0, count: 0 };
+      byCategory[catName].revenue += (Number(item.price) || 0) * (Number(item.quantity) || 1);
+      byCategory[catName].count += Number(item.quantity) || 1;
     }
 
     const result = Object.entries(byCategory)
@@ -47,12 +56,6 @@ export async function GET(req: NextRequest) {
   }
 
   if (type === "sales-by-day") {
-    const orders = await db.order.findMany({
-      where: { createdAt: { gte: since }, status: { not: "CANCELLED" } },
-      select: { total: true, createdAt: true },
-      orderBy: { createdAt: "asc" },
-    });
-
     const byDay: Record<string, { revenue: number; orders: number }> = {};
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date();
@@ -60,10 +63,10 @@ export async function GET(req: NextRequest) {
       const key = d.toISOString().slice(0, 10);
       byDay[key] = { revenue: 0, orders: 0 };
     }
-    for (const o of orders) {
-      const key = o.createdAt.toISOString().slice(0, 10);
+    for (const o of validOrders) {
+      const key = new Date(o.createdAt).toISOString().slice(0, 10);
       if (byDay[key]) {
-        byDay[key].revenue += o.total;
+        byDay[key].revenue += Number(o.total) || 0;
         byDay[key].orders += 1;
       }
     }
@@ -73,13 +76,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (type === "top-customers") {
-    const orders = await db.order.findMany({
-      where: { createdAt: { gte: since }, status: { not: "CANCELLED" } },
-      select: { guestName: true, guestPhone: true, guestEmail: true, total: true, orderNumber: true },
-    });
-
     const byCustomer: Record<string, { name: string; phone: string; email: string; totalSpent: number; orderCount: number }> = {};
-    for (const o of orders) {
+    for (const o of validOrders) {
       const key = o.guestPhone || o.guestEmail || o.guestName;
       if (!byCustomer[key]) {
         byCustomer[key] = {
@@ -90,7 +88,7 @@ export async function GET(req: NextRequest) {
           orderCount: 0,
         };
       }
-      byCustomer[key].totalSpent += o.total;
+      byCustomer[key].totalSpent += Number(o.total) || 0;
       byCustomer[key].orderCount += 1;
     }
 
@@ -102,16 +100,22 @@ export async function GET(req: NextRequest) {
   }
 
   if (type === "top-products") {
-    const items = await db.orderItem.findMany({
-      where: { order: { createdAt: { gte: since }, status: { not: "CANCELLED" } } },
-      select: { name: true, price: true, quantity: true },
-    });
+    // Collect all items from valid orders
+    const allItems: any[] = [];
+    for (const order of validOrders) {
+      if (order.items) {
+        for (const item of order.items) {
+          allItems.push(item);
+        }
+      }
+    }
 
     const byProduct: Record<string, { name: string; revenue: number; sold: number }> = {};
-    for (const it of items) {
-      if (!byProduct[it.name]) byProduct[it.name] = { name: it.name, revenue: 0, sold: 0 };
-      byProduct[it.name].revenue += it.price * it.quantity;
-      byProduct[it.name].sold += it.quantity;
+    for (const it of allItems) {
+      const name = it.name || "غير معروف";
+      if (!byProduct[name]) byProduct[name] = { name, revenue: 0, sold: 0 };
+      byProduct[name].revenue += (Number(it.price) || 0) * (Number(it.quantity) || 1);
+      byProduct[name].sold += Number(it.quantity) || 1;
     }
 
     const result = Object.values(byProduct)

@@ -371,6 +371,9 @@ export const couponRepo = {
   async delete(opts: { where: any }) {
     return deleteRows("coupons", opts.where);
   },
+  async count(opts: any = {}) {
+    return countRows("coupons", opts.where);
+  },
 };
 
 // ===== db.couponUsage =====
@@ -477,6 +480,9 @@ export const userRepo = {
   async findUnique(opts: any) {
     return selectOne("users", opts.where);
   },
+  async findMany(opts: any = {}) {
+    return selectMany("users", { eq: opts.where });
+  },
   async upsert(opts: { where: any; update?: any; create: any }) {
     const existing = await selectOne("users", opts.where);
     if (existing) {
@@ -486,6 +492,21 @@ export const userRepo = {
   },
   async update(opts: { where: any; data: any }) {
     return updateRow("users", opts.where, opts.data);
+  },
+  async count(opts: any = {}) {
+    return countRows("users", opts.where);
+  },
+  async aggregate(opts: any) {
+    const rows = await aggregate("users", { ...opts, select: opts.select || "*" });
+    const result: any = {};
+    if (opts._sum) {
+      result._sum = {};
+      for (const col of Object.keys(opts._sum)) {
+        result._sum[col] = rows.reduce((s, r) => s + (Number(r[col]) || 0), 0);
+      }
+    }
+    if (opts._count !== undefined) result._count = rows.length;
+    return result;
   },
 };
 
