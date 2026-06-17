@@ -15,6 +15,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   LayoutDashboard,
   Package,
   ShoppingCart,
@@ -297,7 +304,7 @@ export function AdminView() {
           <TabsContent value="orders">
             <Card className="bg-white border-rose-gold/20">
               <CardHeader className="flex-row items-center justify-between">
-                <CardTitle className="text-warm-black text-lg">أحدث الطلبات</CardTitle>
+                <CardTitle className="text-warm-black text-lg">أحدث الطلبات ({recentOrders.length})</CardTitle>
                 <Input
                   value={orderFilter}
                   onChange={(e) => setOrderFilter(e.target.value)}
@@ -316,6 +323,7 @@ export function AdminView() {
                         <TableHead>المحافظة</TableHead>
                         <TableHead>الإجمالي</TableHead>
                         <TableHead>الحالة</TableHead>
+                        <TableHead>تحديث</TableHead>
                         <TableHead>التاريخ</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -339,6 +347,39 @@ export function AdminView() {
                                 <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ color: meta.color, background: meta.bg }}>
                                   {meta.label}
                                 </span>
+                              </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={o.status}
+                                  onValueChange={async (v) => {
+                                    try {
+                                      const res = await fetch(`/api/admin/orders/${o.id}/status`, {
+                                        method: "PATCH",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ status: v }),
+                                      });
+                                      if (res.ok) {
+                                        toast.success("تم تحديث حالة الطلب");
+                                        loadStats();
+                                      } else {
+                                        toast.error("فشل تحديث الحالة");
+                                      }
+                                    } catch {
+                                      toast.error("خطأ في الاتصال");
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[140px] h-8 text-xs bg-cream-dark/30">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Object.entries(ORDER_STATUS_META).map(([key, m]) => (
+                                      <SelectItem key={key} value={key} className="text-xs">
+                                        {m.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </TableCell>
                               <TableCell className="text-xs text-warm-gray">{new Date(o.createdAt).toLocaleDateString("ar-EG")}</TableCell>
                             </TableRow>

@@ -113,3 +113,87 @@ Generating 34 jewelry images via z-ai-web-dev-sdk (hero, 4 categories, 3 brand, 
 4. Add size guide page
 5. Add more admin actions (update order status, edit products)
 6. Performance: add loading skeletons, image lazy-loading audit
+
+---
+
+## Task ID: 7 — Cron Round 1: QA + Bug Fixes + New Features (Completed by review agent)
+
+**Trigger:** Recurring cron job (webDevReview, every 15 min)
+
+**Work Log:**
+
+### QA Findings & Bugs Fixed
+1. **CRITICAL BUG: Mobile menu drawer was missing** — The hamburger button called `setMobileMenuOpen(true)` but no Sheet/drawer was rendered. Completely rewrote `Header.tsx` to add a full mobile nav drawer with:
+   - Two sections: "تسوق" (Shop) and "خدمة العملاء" (Customer Service) with icons
+   - All navigation items including new size-guide, track-order, FAQ, policies
+   - Account/admin login footer with role-based buttons (logout, admin dashboard)
+   - Active state highlighting on current view
+   - Smooth close-on-navigate behavior
+2. **Build error: duplicate `setView` in HomeView** — Fixed by merging two `useShopStore()` destructuring calls into one
+3. **Recently Viewed section not rendering** — Fixed Zustand persist hydration timing issue by separating the recently-viewed fetch into its own `useEffect` with `[recentIds]` dependency instead of `[]`
+
+### New Features Added
+1. **Size Guide page** (`SizeGuideView`) — Full page with:
+   - Bracelet size table (16-20cm with wrist measurements)
+   - Ring size table (10-25 with EU equivalents)
+   - 3-step "How to measure" guide
+   - Contact/WhatsApp CTAs for help
+   - Added to Footer links, mobile menu, and page title map
+2. **Quick View modal** (`QuickViewModal` + `QuickViewManager`) — Key PRD feature:
+   - Opens on product card hover/click "عرض سريع" button
+   - Shows image gallery with thumbnails
+   - Full personalization form (name, metal, size, gift box)
+   - Quantity selector
+   - Add to cart / Buy now / View full details / Wishlist buttons
+   - Price calculation with metal addons
+   - Managed via new `quickViewSlug` state in Zustand store
+3. **Admin order status management** — New API + UI:
+   - `PATCH /api/admin/orders/[id]/status` — updates order status with validation
+   - Admin orders table now has a "تحديث" column with a Select dropdown for all 8 order statuses
+   - Toast feedback on success/failure, auto-refresh of stats
+4. **Recently Viewed section on home** — Shows last 4 viewed products with proper hydration-safe fetching
+
+### Styling Improvements
+- Mobile menu drawer with burgundy gradient header, rose-gold section dividers, icon-led nav items
+- Product card quick view overlay upgraded from passive text to active clickable button with shadow
+- Admin orders table enhanced with inline status Select dropdowns
+- Size guide page with luxury card layout, step indicators, and brand-consistent styling
+- Quick view modal with split-layout (image + info), scrollable info panel, thumbnail strip
+
+### Files Modified/Created
+- `src/components/glimoka/Header.tsx` — Complete rewrite with mobile menu drawer
+- `src/components/glimoka/views/HomeView.tsx` — Recently viewed section + hydration fix
+- `src/components/glimoka/views/InfoViews.tsx` — Added `SizeGuideView`
+- `src/components/glimoka/ProductCard.tsx` — Quick view button integration
+- `src/components/glimoka/QuickViewModal.tsx` — NEW: Quick view modal component
+- `src/components/glimoka/QuickViewManager.tsx` — NEW: Quick view state manager
+- `src/components/glimoka/views/AdminView.tsx` — Order status update UI
+- `src/app/api/admin/orders/[id]/status/route.ts` — NEW: Order status PATCH API
+- `src/lib/store.ts` — Added `quickViewSlug`, `openQuickView`, `closeQuickView`, `size-guide` view type
+- `src/app/page.tsx` — Added SizeGuideView + QuickViewManager
+- `src/components/glimoka/Footer.tsx` — Added size-guide link
+
+### Verification Results
+- ✅ Lint clean (0 errors, 0 warnings)
+- ✅ No runtime/console errors
+- ✅ Mobile menu opens and navigates correctly (tested on 390x844 viewport)
+- ✅ Size Guide page renders with all sections
+- ✅ Quick View modal opens from product card with full personalization form
+- ✅ Admin order status update works (PENDING → CONFIRMED, toast "تم تحديث حالة الطلب")
+- ✅ Recently Viewed section shows on home after browsing products
+- ✅ All 8 order statuses available in admin dropdown
+
+### Image Generation Status
+- Hero, 4 categories, 3 brand images: ✅ Complete (7/7)
+- Product images: 5/24 complete — auto-restart wrapper continues in background
+- All images use luxury jewelry photography on cream backgrounds matching GLIMOKA brand
+
+### Next Phase Recommendations
+1. Complete remaining product images (19/24)
+2. Add loyalty points redemption at checkout
+3. Add product search with AI semantic recommendations
+4. Add abandoned cart recovery flow
+5. Add admin product CRUD (add/edit/delete products)
+6. Add customer order history with re-order functionality
+7. Add email notification templates (order confirmation, shipping)
+

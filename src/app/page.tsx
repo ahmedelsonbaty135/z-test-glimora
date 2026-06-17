@@ -4,6 +4,7 @@ import { useShopStore } from "@/lib/store";
 import { Header } from "@/components/glimoka/Header";
 import { Footer } from "@/components/glimoka/Footer";
 import { FloatingWidgets } from "@/components/glimoka/FloatingWidgets";
+import { QuickViewManager } from "@/components/glimoka/QuickViewManager";
 import { HomeView } from "@/components/glimoka/views/HomeView";
 import { ProductsView } from "@/components/glimoka/views/ProductsView";
 import { ProductDetailView } from "@/components/glimoka/views/ProductDetailView";
@@ -19,6 +20,7 @@ import {
   TrackOrderView,
   ShippingPolicyView,
   ReturnPolicyView,
+  SizeGuideView,
 } from "@/components/glimoka/views/InfoViews";
 import { useEffect } from "react";
 
@@ -42,6 +44,7 @@ export default function Home() {
       "track-order": "تتبع الطلب | GLIMOKA",
       "shipping-policy": "سياسة الشحن | GLIMOKA",
       "return-policy": "سياسة الإرجاع | GLIMOKA",
+      "size-guide": "دليل المقاسات | GLIMOKA",
     };
     document.title = titles[view] || "GLIMOKA";
   }, [view]);
@@ -76,6 +79,8 @@ export default function Home() {
         return <ShippingPolicyView />;
       case "return-policy":
         return <ReturnPolicyView />;
+      case "size-guide":
+        return <SizeGuideView />;
       default:
         return <HomeView />;
     }
@@ -87,6 +92,7 @@ export default function Home() {
       <main className="flex-1">{renderView()}</main>
       <Footer />
       <FloatingWidgets />
+      <QuickViewManager />
     </div>
   );
 }

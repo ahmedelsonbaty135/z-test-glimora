@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Phone, Mail, MapPin, Clock, Send, Package, Search, Truck, RotateCcw, Shield, CreditCard, ChevronLeft, Award, Heart, Sparkles, Gem } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, Package, Search, Truck, RotateCcw, Shield, CreditCard, ChevronLeft, Award, Heart, Sparkles, Gem, Ruler } from "lucide-react";
 import { formatEGP, ORDER_STATUS_META } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -448,6 +448,123 @@ export function ReturnPolicyView() {
           <h2 className="font-bold text-warm-black text-lg mb-2">استرداد المبلغ</h2>
           <p>يتم استرداد المبلغ نقدًا أو عبر التحويل البنكي خلال 5-7 أيام عمل من استلام المنتج المُعاد. رسوم الشحن غير قابلة للاسترداد.</p>
         </section>
+      </div>
+    </div>
+  );
+}
+
+// ===== Size Guide =====
+export function SizeGuideView() {
+  const { setView } = useShopStore();
+
+  const braceletSizes = [
+    { size: "16 سم", wrist: "14-15 سم", desc: "معصم صغير / أطفال" },
+    { size: "17 سم", wrist: "15-16 سم", desc: "معصم نحيف" },
+    { size: "18 سم", wrist: "16-17 سم", desc: "المقاس الأكثر شيوعًا للنساء" },
+    { size: "19 سم", wrist: "17-18 سم", desc: "معصم متوسط" },
+    { size: "20 سم", wrist: "18-19 سم", desc: "معصم كبير / رجال" },
+  ];
+
+  const ringSizes = [
+    { size: "10-12", desc: "أصابع رفيعة جداً", eu: "50-52" },
+    { size: "13-15", desc: "أصابع رفيعة", eu: "53-55" },
+    { size: "16-18", desc: "المقاس الأكثر شيوعًا", eu: "56-58" },
+    { size: "19-21", desc: "أصابع متوسطة", eu: "59-61" },
+    { size: "22-25", desc: "أصابع كبيرة", eu: "62-65" },
+  ];
+
+  return (
+    <div className="container mx-auto px-4 py-10 lg:py-16 max-w-4xl">
+      <nav className="flex items-center gap-1.5 text-sm text-warm-gray mb-5">
+        <button onClick={() => setView("home")} className="hover:text-burgundy">الرئيسية</button>
+        <ChevronLeft className="w-3 h-3" />
+        <span className="text-warm-black font-medium">دليل المقاسات</span>
+      </nav>
+
+      <div className="text-center mb-10">
+        <div className="w-16 h-16 rounded-full bg-burgundy-gradient mx-auto flex items-center justify-center mb-4">
+          <Ruler className="w-8 h-8 text-rose-gold-light" />
+        </div>
+        <h1 className="text-3xl font-black text-warm-black mb-2">دليل المقاسات</h1>
+        <p className="text-warm-gray">اختر المقاس المثالي لمجوهراتك المخصصة</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Bracelet sizes */}
+        <section className="bg-white rounded-2xl border border-rose-gold/20 p-6">
+          <h2 className="font-black text-warm-black text-lg mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-burgundy text-white text-sm flex items-center justify-center">1</span>
+            مقاسات الأساور
+          </h2>
+          <p className="text-sm text-warm-gray mb-4">قِر محيط معصمك بشريط قياس، ثم اختر المقاس المناسب:</p>
+          <div className="space-y-2">
+            {braceletSizes.map((s) => (
+              <div key={s.size} className="flex items-center justify-between p-3 rounded-xl bg-cream-dark/40 border border-rose-gold/10">
+                <div>
+                  <p className="font-bold text-warm-black text-sm">{s.size}</p>
+                  <p className="text-xs text-warm-gray">{s.desc}</p>
+                </div>
+                <span className="text-xs font-medium text-burgundy bg-burgundy/10 px-2 py-1 rounded-full">
+                  معصم {s.wrist}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Ring sizes */}
+        <section className="bg-white rounded-2xl border border-rose-gold/20 p-6">
+          <h2 className="font-black text-warm-black text-lg mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-burgundy text-white text-sm flex items-center justify-center">2</span>
+            مقاسات الخواتم
+          </h2>
+          <p className="text-sm text-warm-gray mb-4">استخدم مقياس الخواتم أو قِس قطر خاتم موجود:</p>
+          <div className="space-y-2">
+            {ringSizes.map((s) => (
+              <div key={s.size} className="flex items-center justify-between p-3 rounded-xl bg-cream-dark/40 border border-rose-gold/10">
+                <div>
+                  <p className="font-bold text-warm-black text-sm">مقاس {s.size}</p>
+                  <p className="text-xs text-warm-gray">{s.desc}</p>
+                </div>
+                <span className="text-xs font-medium text-burgundy bg-burgundy/10 px-2 py-1 rounded-full" dir="ltr">
+                  EU {s.eu}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* How to measure */}
+      <section className="bg-cream-dark/50 rounded-2xl border border-rose-gold/20 p-6">
+        <h2 className="font-black text-warm-black text-lg mb-4">كيف تقيس معصمك؟</h2>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {[
+            { step: "1", title: "استخدم شريط قياس", desc: "لُف شريط قياس ناعم حول معصمك في أضيق نقطة" },
+            { step: "2", title: "سجّل القياس", desc: "أضف 1-2 سم للراحة حسب تفضيلك (ضيق أو فضفاض)" },
+            { step: "3", title: "اختر المقاس", desc: "اختر المقاس الأقرب لقياسك من الجدول بالأعلى" },
+          ].map((s) => (
+            <div key={s.step} className="bg-white rounded-xl p-4 border border-rose-gold/15">
+              <div className="w-8 h-8 rounded-full bg-rose-gold text-warm-black text-sm font-bold flex items-center justify-center mb-2">
+                {s.step}
+              </div>
+              <p className="font-bold text-warm-black text-sm mb-1">{s.title}</p>
+              <p className="text-xs text-warm-gray">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="text-center mt-8">
+        <p className="text-sm text-warm-gray mb-3">لست متأكدًا من المقاس؟ نحن هنا لمساعدتك!</p>
+        <div className="flex gap-2 justify-center">
+          <Button onClick={() => setView("contact")} variant="outline" className="border-burgundy text-burgundy">
+            تواصل معنا
+          </Button>
+          <a href="https://wa.me/201000000000?text=محتاج مساعدة في اختيار المقاس" target="_blank" rel="noopener noreferrer">
+            <Button className="bg-emerald-soft hover:bg-emerald-soft/90">واتساب</Button>
+          </a>
+        </div>
       </div>
     </div>
   );

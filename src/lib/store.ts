@@ -16,7 +16,8 @@ export type ViewName =
   | "faq"
   | "track-order"
   | "shipping-policy"
-  | "return-policy";
+  | "return-policy"
+  | "size-guide";
 
 export interface CartItemCustomization {
   metal: string;
@@ -67,6 +68,7 @@ interface ShopState {
   cartDrawerOpen: boolean;
   filtersOpen: boolean;
   chatbotOpen: boolean;
+  quickViewSlug: string | null;
 
   // Auth (mock — sandbox)
   user: { email: string; name: string; role: "CUSTOMER" | "ADMIN" } | null;
@@ -90,6 +92,8 @@ interface ShopState {
   setCartDrawerOpen: (v: boolean) => void;
   setFiltersOpen: (v: boolean) => void;
   setChatbotOpen: (v: boolean) => void;
+  openQuickView: (slug: string) => void;
+  closeQuickView: () => void;
 
   login: (email: string, name: string, role?: "CUSTOMER" | "ADMIN") => void;
   logout: () => void;
@@ -120,6 +124,7 @@ export const useShopStore = create<ShopState>()(
       cartDrawerOpen: false,
       filtersOpen: false,
       chatbotOpen: false,
+      quickViewSlug: null,
 
       user: null,
 
@@ -196,6 +201,8 @@ export const useShopStore = create<ShopState>()(
       setCartDrawerOpen: (v) => set({ cartDrawerOpen: v }),
       setFiltersOpen: (v) => set({ filtersOpen: v }),
       setChatbotOpen: (v) => set({ chatbotOpen: v }),
+      openQuickView: (slug) => set({ quickViewSlug: slug }),
+      closeQuickView: () => set({ quickViewSlug: null }),
 
       login: (email, name, role = "CUSTOMER") =>
         set({ user: { email, name, role } }),

@@ -26,7 +26,7 @@ export interface ProductCardData {
 }
 
 export function ProductCard({ product }: { product: ProductCardData }) {
-  const { openProduct, addToCart, toggleWishlist, wishlist, setView } = useShopStore();
+  const { openProduct, addToCart, toggleWishlist, wishlist, openQuickView } = useShopStore();
   const image = product.images[0]?.url || "/products/placeholder.jpg";
   const discount = discountPercent(product.basePrice, product.comparePrice);
   const isWishlisted = wishlist.includes(product.id);
@@ -110,10 +110,16 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           loading="lazy"
         />
         {/* Quick view overlay */}
-        <div className="absolute inset-0 bg-warm-black/0 group-hover:bg-warm-black/10 transition-colors flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
-          <span className="text-xs text-white bg-burgundy/90 px-3 py-1.5 rounded-full flex items-center gap-1">
-            <Eye className="w-3 h-3" /> عرض سريع
-          </span>
+        <div className="absolute inset-0 bg-warm-black/0 group-hover:bg-warm-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openQuickView(product.slug);
+            }}
+            className="text-xs text-white bg-burgundy/90 hover:bg-burgundy px-4 py-2 rounded-full flex items-center gap-1.5 shadow-luxury"
+          >
+            <Eye className="w-3.5 h-3.5" /> عرض سريع
+          </button>
         </div>
       </div>
 

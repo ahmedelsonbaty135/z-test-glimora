@@ -19,6 +19,7 @@ import { ProductCard, type ProductCardData } from "../ProductCard";
 import { Button } from "@/components/ui/button";
 import { formatEGP } from "@/lib/utils";
 import { toast } from "sonner";
+import { Clock } from "lucide-react";
 
 const CATEGORIES = [
   { slug: "bracelets", name: "أساور", desc: "باسمك المخصص", icon: " bracelet", img: "/categories/bracelets.jpg" },
@@ -35,10 +36,11 @@ const TESTIMONIALS = [
 ];
 
 export function HomeView() {
-  const { setView, setCartDrawerOpen } = useShopStore();
+  const { setView, setCartDrawerOpen, recentlyViewed: recentIds } = useShopStore();
   const [bestSellers, setBestSellers] = useState<ProductCardData[]>([]);
   const [featured, setFeatured] = useState<ProductCardData[]>([]);
   const [onSale, setOnSale] = useState<ProductCardData[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,6 +59,28 @@ export function HomeView() {
       }
     })();
   }, []);
+
+  // Fetch recently viewed products (separate effect to handle hydration timing)
+  useEffect(() => {
+    if (recentIds.length === 0) {
+      setRecentlyViewed([]);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/products?limit=100")
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        const ordered = recentIds
+          .map((id) => (data.products || []).find((p: ProductCardData) => p.id === id))
+          .filter(Boolean)
+          .slice(0, 4) as ProductCardData[];
+        setRecentlyViewed(ordered);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [recentIds]);
 
   const [offerEnds] = useState(() => {
     const d = new Date();
@@ -482,6 +506,23 @@ export function HomeView() {
           </div>
         </div>
       </section>
+
+      {/* ===== RECENTLY VIEWED ===== */}
+      {recentlyViewed.length > 0 && (
+        <section className="container mx-auto px-4">
+          <SectionHeading
+            eyebrow="تابع التصفح"
+            title="شاهدته مؤخرًا"
+            subtitle="استكمل من حيث توقفت"
+            align="right"
+          />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
+            {recentlyViewed.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ===== NEWSLETTER ===== */}
       <section className="container mx-auto px-4">
