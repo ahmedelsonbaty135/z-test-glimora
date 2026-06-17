@@ -20,6 +20,7 @@ import {
   Headphones,
   Gem,
   Scissors,
+  X,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { ProductCard, type ProductCardData } from "../ProductCard";
@@ -43,7 +44,7 @@ const TESTIMONIALS = [
 ];
 
 export function HomeView() {
-  const { setView, setCartDrawerOpen, recentlyViewed: recentIds } = useShopStore();
+  const { setView, setCartDrawerOpen, recentlyViewed: recentIds, clearRecentlyViewed } = useShopStore();
   const [bestSellers, setBestSellers] = useState<ProductCardData[]>([]);
   const [featured, setFeatured] = useState<ProductCardData[]>([]);
   const [onSale, setOnSale] = useState<ProductCardData[]>([]);
@@ -517,13 +518,24 @@ export function HomeView() {
       {/* ===== RECENTLY VIEWED ===== */}
       {recentlyViewed.length > 0 && (
         <section className="container mx-auto px-4">
-          <SectionHeading
-            eyebrow="تابع التصفح"
-            title="شاهدته مؤخرًا"
-            subtitle="استكمل من حيث توقفت"
-            align="right"
-          />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <p className="text-sm font-bold tracking-wide mb-2 text-rose-gold">تابع التصفح</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-warm-black">شاهدته مؤخرًا</h2>
+              <p className="text-sm text-warm-gray mt-1">استكمل من حيث توقفت</p>
+            </div>
+            <button
+              onClick={() => {
+                clearRecentlyViewed();
+                toast.success("تم مسح السجل");
+              }}
+              className="text-xs text-warm-gray hover:text-danger-soft transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-cream-dark"
+            >
+              <X className="w-3.5 h-3.5" />
+              مسح السجل
+            </button>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {recentlyViewed.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

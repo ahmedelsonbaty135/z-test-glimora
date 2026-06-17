@@ -285,12 +285,27 @@ export function ProductsView() {
         <div>
           {loading ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-rose-gold/20 overflow-hidden">
+              {[...Array(9)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-rose-gold/20 overflow-hidden"
+                  style={{ animation: `float-up 0.4s ease-out ${i * 0.05}s both` }}
+                >
                   <div className="aspect-square shimmer" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-3 w-2/3 shimmer rounded" />
-                    <div className="h-4 w-1/3 shimmer rounded" />
+                  <div className="p-4 space-y-2.5">
+                    <div className="h-2.5 w-1/3 shimmer rounded-full" />
+                    <div className="h-3.5 w-3/4 shimmer rounded" />
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 shimmer rounded-full" />
+                      <div className="h-2 w-10 shimmer rounded" />
+                    </div>
+                    <div className="flex items-end justify-between pt-1">
+                      <div className="space-y-1">
+                        <div className="h-5 w-16 shimmer rounded" />
+                        <div className="h-2.5 w-12 shimmer rounded" />
+                      </div>
+                      <div className="w-9 h-9 shimmer rounded-full" />
+                    </div>
                   </div>
                 </div>
               ))}

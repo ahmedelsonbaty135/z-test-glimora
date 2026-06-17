@@ -6,6 +6,7 @@ import { Footer } from "@/components/glimoka/Footer";
 import { FloatingWidgets } from "@/components/glimoka/FloatingWidgets";
 import { QuickViewManager } from "@/components/glimoka/QuickViewManager";
 import { CompareBar } from "@/components/glimoka/CompareBar";
+import { AbandonedCartReminder } from "@/components/glimoka/AbandonedCartReminder";
 import { HomeView } from "@/components/glimoka/views/HomeView";
 import { ProductsView } from "@/components/glimoka/views/ProductsView";
 import { ProductDetailView } from "@/components/glimoka/views/ProductDetailView";
@@ -26,9 +27,11 @@ import {
   SizeGuideView,
 } from "@/components/glimoka/views/InfoViews";
 import { useEffect } from "react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 export default function Home() {
-  const { view } = useShopStore();
+  const { view, setView } = useShopStore();
 
   // Update document title based on view
   useEffect(() => {
@@ -53,6 +56,27 @@ export default function Home() {
     };
     document.title = titles[view] || "GLIMOKA";
   }, [view]);
+
+  // Handle shared wishlist URL (?wishlist=id1,id2,...)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const wishlistParam = params.get("wishlist");
+    if (wishlistParam) {
+      const ids = wishlistParam.split(",").filter(Boolean);
+      if (ids.length > 0) {
+        setTimeout(() => {
+          toast.success(`💎 شارك أحدهم مفضلته معك (${ids.length} منتج)`, {
+            description: "تصفح المنتجات أدناه — مفضلة صديقك بانتظارك",
+            duration: 5000,
+          });
+          setView("products");
+          // clean the URL
+          window.history.replaceState({}, "", window.location.pathname);
+        }, 800);
+      }
+    }
+  }, [setView]);
 
   const renderView = () => {
     switch (view) {
@@ -98,11 +122,21 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-cream">
       <Header />
-      <main className="flex-1">{renderView()}</main>
+      <main className="flex-1">
+        <motion.div
+          key={view}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+        >
+          {renderView()}
+        </motion.div>
+      </main>
       <Footer />
       <FloatingWidgets />
       <QuickViewManager />
       <CompareBar />
+      <AbandonedCartReminder />
     </div>
   );
 }

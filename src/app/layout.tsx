@@ -58,7 +58,25 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
-        <SonnerToaster position="top-center" richColors closeButton />
+        <SonnerToaster
+          position="top-center"
+          richColors
+          closeButton
+          toastOptions={{
+            style: {
+              fontFamily: "var(--font-cairo), sans-serif",
+              borderRadius: "12px",
+              border: "1px solid rgba(201, 168, 124, 0.3)",
+              boxShadow: "0 10px 40px -4px rgba(106, 27, 53, 0.20)",
+            },
+            classNames: {
+              success: "bg-emerald-50 border-emerald-200 text-emerald-800",
+              error: "bg-red-50 border-red-200 text-red-800",
+              warning: "bg-amber-50 border-amber-200 text-amber-800",
+              info: "bg-cream border-rose-gold/30 text-warm-black",
+            },
+          }}
+        />
       </body>
     </html>
   );

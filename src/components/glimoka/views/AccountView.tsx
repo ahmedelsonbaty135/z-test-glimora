@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingBag, Phone, Mail, Gift, ArrowLeft, Search, RotateCw } from "lucide-react";
+import { User, Package, Heart, LogOut, Settings, MapPin, Star, Trash2, ShoppingBag, Phone, Mail, Gift, ArrowLeft, Search, RotateCw, Share2, Copy, Check } from "lucide-react";
 import { ProductCard, type ProductCardData } from "../ProductCard";
 import { WishlistCard } from "../WishlistCard";
 import { AddressBook } from "../AddressBook";
@@ -44,6 +44,7 @@ export function AccountView() {
   const [wishlistProducts, setWishlistProducts] = useState<ProductCardData[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [phoneSearch, setPhoneSearch] = useState(user?.name || "");
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -317,42 +318,72 @@ export function AccountView() {
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <p className="text-sm text-warm-gray">{wishlistProducts.length} منتج في المفضلة</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-burgundy text-burgundy hover:bg-burgundy hover:text-white"
-                  onClick={() => {
-                    wishlistProducts.forEach((p) => {
-                      const metals = p.metalOptions.split(",").map((m) => m.trim());
-                      addToCart({
-                        productId: p.id,
-                        slug: p.slug,
-                        name: p.name,
-                        image: p.images[0]?.url || "/products/placeholder.jpg",
-                        basePrice: p.basePrice,
-                        unitPrice: p.basePrice,
-                        quantity: 1,
-                        customization: {
-                          metal: metals[0] || "SILVER_925",
-                          size: "17",
-                          font: "خط عربي تقليدي",
-                          name1: "",
-                          name2: "",
-                          giftBox: false,
-                          giftCard: "",
-                        },
-                        maxStock: p.stock,
-                      } as any);
-                    });
-                    toast.success(`تم نقل ${wishlistProducts.length} منتج للسلة`);
-                    setView("cart");
-                  }}
-                >
-                  <ShoppingBag className="w-4 h-4 ml-1" />
-                  نقل الكل للسلة
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-rose-gold/40 text-warm-gray hover:bg-cream-dark"
+                    onClick={async () => {
+                      const shareUrl = `${window.location.origin}/?wishlist=${wishlist.join(",")}`;
+                      try {
+                        if (navigator.share) {
+                          await navigator.share({
+                            title: "مفضلتي في GLIMOKA",
+                            text: "شاهد مجوهراتي المفضلة من GLIMOKA 💎",
+                            url: shareUrl,
+                          });
+                          toast.success("تمت المشاركة");
+                        } else {
+                          await navigator.clipboard.writeText(shareUrl);
+                          setShareCopied(true);
+                          toast.success("تم نسخ رابط المفضلة");
+                          setTimeout(() => setShareCopied(false), 2000);
+                        }
+                      } catch {
+                        // user cancelled share
+                      }
+                    }}
+                  >
+                    {shareCopied ? <Check className="w-4 h-4 ml-1 text-emerald-soft" /> : <Share2 className="w-4 h-4 ml-1" />}
+                    {shareCopied ? "تم النسخ" : "مشاركة"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-burgundy text-burgundy hover:bg-burgundy hover:text-white"
+                    onClick={() => {
+                      wishlistProducts.forEach((p) => {
+                        const metals = p.metalOptions.split(",").map((m) => m.trim());
+                        addToCart({
+                          productId: p.id,
+                          slug: p.slug,
+                          name: p.name,
+                          image: p.images[0]?.url || "/products/placeholder.jpg",
+                          basePrice: p.basePrice,
+                          unitPrice: p.basePrice,
+                          quantity: 1,
+                          customization: {
+                            metal: metals[0] || "SILVER_925",
+                            size: "17",
+                            font: "خط عربي تقليدي",
+                            name1: "",
+                            name2: "",
+                            giftBox: false,
+                            giftCard: "",
+                          },
+                          maxStock: p.stock,
+                        } as any);
+                      });
+                      toast.success(`تم نقل ${wishlistProducts.length} منتج للسلة`);
+                      setView("cart");
+                    }}
+                  >
+                    <ShoppingBag className="w-4 h-4 ml-1" />
+                    نقل الكل للسلة
+                  </Button>
+                </div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {wishlistProducts.map((p) => (

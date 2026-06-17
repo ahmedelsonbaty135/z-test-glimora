@@ -334,7 +334,7 @@ function CouponFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-luxury bg-cream">
+      <DialogContent aria-describedby={undefined} className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-luxury bg-cream">
         <DialogHeader>
           <DialogTitle className="text-warm-black text-lg flex items-center justify-between">
             {coupon ? "تعديل الكوبون" : "كوبون جديد"}
@@ -343,6 +343,7 @@ function CouponFormDialog({
             </button>
           </DialogTitle>
         </DialogHeader>
+        <p className="sr-only">نموذج إدارة الكوبون</p>
         <form onSubmit={handleSave} className="space-y-4">
           <div>
             <Label className="text-sm font-bold">كود الكوبون *</Label>

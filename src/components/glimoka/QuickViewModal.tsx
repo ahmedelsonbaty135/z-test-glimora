@@ -121,9 +121,10 @@ export function QuickViewModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto scrollbar-luxury bg-cream p-0 gap-0">
+      <DialogContent aria-describedby={undefined} className="max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto scrollbar-luxury bg-cream p-0 gap-0">
         <DialogHeader className="sr-only">
           <DialogTitle>{product.name}</DialogTitle>
+          <p>عرض سريع لتفاصيل المنتج</p>
         </DialogHeader>
 
         <div className="grid md:grid-cols-2 gap-0">

@@ -214,6 +214,7 @@ model Review {
   rating    Int
   title     String?
   body      String
+  photosJson String? // JSON array of base64 data URLs (max 3)
   isApproved Boolean @default(false)
   createdAt DateTime @default(now())
 

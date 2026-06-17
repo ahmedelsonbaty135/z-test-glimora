@@ -214,13 +214,14 @@ export function AddressBook() {
 
       {/* Form dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent aria-describedby={undefined} className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-burgundy">
               <MapPin className="w-5 h-5" />
               {editingId ? "تعديل العنوان" : "إضافة عنوان جديد"}
             </DialogTitle>
           </DialogHeader>
+          <p className="sr-only">نموذج إدارة العنوان</p>
           <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
             {/* Label selector */}
             <div>

@@ -329,7 +329,7 @@ function ProductFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-luxury bg-cream">
+      <DialogContent aria-describedby={undefined} className="max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-luxury bg-cream">
         <DialogHeader>
           <DialogTitle className="text-warm-black text-lg flex items-center justify-between">
             {product ? "تعديل المنتج" : "إضافة منتج جديد"}
@@ -338,6 +338,7 @@ function ProductFormDialog({
             </button>
           </DialogTitle>
         </DialogHeader>
+        <p className="sr-only">نموذج إدارة المنتج</p>
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>

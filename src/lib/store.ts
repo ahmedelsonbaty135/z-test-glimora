@@ -111,6 +111,10 @@ interface ShopState {
   // Gift cards in cart
   giftCards: GiftCardItem[];
 
+  // Abandoned cart recovery
+  cartLastUpdated: number | null; // timestamp
+  cartReminderDismissed: boolean;
+
   // Actions
   setView: (view: ViewName, opts?: { slug?: string; category?: string }) => void;
   openProduct: (slug: string) => void;
@@ -122,9 +126,11 @@ interface ShopState {
   clearCart: () => void;
   applyCoupon: (c: AppliedCoupon) => void;
   removeCoupon: () => void;
+  dismissCartReminder: () => void;
 
   toggleWishlist: (productId: string) => void;
   addRecentlyViewed: (productId: string) => void;
+  clearRecentlyViewed: () => void;
 
   toggleCompare: (productId: string) => void;
   clearCompare: () => void;
@@ -189,6 +195,9 @@ export const useShopStore = create<ShopState>()(
       selectedAddressId: null,
       giftCards: [],
 
+      cartLastUpdated: null,
+      cartReminderDismissed: false,
+
       setView: (view, opts) => {
         set({
           view,
@@ -221,9 +230,11 @@ export const useShopStore = create<ShopState>()(
                 ? { ...i, quantity: Math.min(i.maxStock, i.quantity + item.quantity) }
                 : i
             ),
+            cartLastUpdated: Date.now(),
+            cartReminderDismissed: false,
           });
         } else {
-          set({ items: [...get().items, { ...item, id }] });
+          set({ items: [...get().items, { ...item, id }], cartLastUpdated: Date.now(), cartReminderDismissed: false });
         }
       },
 
@@ -234,15 +245,21 @@ export const useShopStore = create<ShopState>()(
               i.id === id ? { ...i, quantity: Math.max(1, Math.min(i.maxStock, qty)) } : i
             )
             .filter((i) => i.quantity > 0),
+          cartLastUpdated: Date.now(),
         }),
 
       removeFromCart: (id) =>
-        set({ items: get().items.filter((i) => i.id !== id) }),
+        set({
+          items: get().items.filter((i) => i.id !== id),
+          cartLastUpdated: get().items.length > 1 ? Date.now() : null,
+        }),
 
-      clearCart: () => set({ items: [], coupon: null, giftCards: [] }),
+      clearCart: () => set({ items: [], coupon: null, giftCards: [], cartLastUpdated: null, cartReminderDismissed: false }),
 
       applyCoupon: (c) => set({ coupon: c }),
       removeCoupon: () => set({ coupon: null }),
+
+      dismissCartReminder: () => set({ cartReminderDismissed: true }),
 
       toggleWishlist: (productId) => {
         const w = get().wishlist;
@@ -257,6 +274,8 @@ export const useShopStore = create<ShopState>()(
         const r = get().recentlyViewed.filter((id) => id !== productId);
         set({ recentlyViewed: [productId, ...r].slice(0, 8) });
       },
+
+      clearRecentlyViewed: () => set({ recentlyViewed: [] }),
 
       toggleCompare: (productId) => {
         const c = get().compareList;
@@ -335,6 +354,8 @@ export const useShopStore = create<ShopState>()(
         compareList: s.compareList,
         addresses: s.addresses,
         giftCards: s.giftCards,
+        cartLastUpdated: s.cartLastUpdated,
+        cartReminderDismissed: s.cartReminderDismissed,
       }),
     }
   )

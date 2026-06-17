@@ -18,6 +18,8 @@ import {
   MessageSquare,
   Sparkles,
   ZoomIn,
+  Camera,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,7 @@ interface Review {
   rating: number;
   title?: string | null;
   body: string;
+  photosJson?: string | null;
   createdAt: string;
 }
 
@@ -86,6 +89,7 @@ export function ProductDetailView() {
   const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
   const [reviewForm, setReviewForm] = useState({ authorName: "", rating: 5, title: "", body: "" });
+  const [reviewPhotos, setReviewPhotos] = useState<string[]>([]); // base64 data URLs
   const [submittingReview, setSubmittingReview] = useState(false);
   const [zoom, setZoom] = useState(false);
   const imgWrapRef = useRef<HTMLDivElement>(null);
@@ -213,11 +217,12 @@ export function ProductDetailView() {
       const res = await fetch("/api/reviews/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...reviewForm, productId: product.id }),
+        body: JSON.stringify({ ...reviewForm, productId: product.id, photos: reviewPhotos }),
       });
       if (res.ok) {
         toast.success("شكرًا! تمت إضافة مراجعتك");
         setReviewForm({ authorName: "", rating: 5, title: "", body: "" });
+        setReviewPhotos([]);
         // refresh
         const data = await fetch(`/api/products/${product.slug}`).then((r) => r.json());
         if (data.product) setProduct(data.product);
@@ -225,6 +230,32 @@ export function ProductDetailView() {
     } finally {
       setSubmittingReview(false);
     }
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const maxPhotos = 3;
+    const remaining = maxPhotos - reviewPhotos.length;
+    if (remaining <= 0) {
+      toast.error("يمكن إضافة حتى 3 صور");
+      return;
+    }
+    const toProcess = Array.from(files).slice(0, remaining);
+    toProcess.forEach((file) => {
+      if (!file.type.startsWith("image/")) return;
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("حجم الصورة يجب أن يكون أقل من 5 ميجابايت");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        setReviewPhotos((prev) => [...prev, result]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
   };
 
   // Rating distribution
@@ -658,25 +689,46 @@ export function ProductDetailView() {
                 {product.reviews.length === 0 ? (
                   <p className="text-center text-warm-gray py-8">لا توجد مراجعات بعد. كن أول من يراجع!</p>
                 ) : (
-                  product.reviews.map((r) => (
-                    <div key={r.id} className="bg-white rounded-xl p-4 border border-rose-gold/15">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-burgundy-gradient text-white text-sm font-bold flex items-center justify-center">
-                            {r.authorName.charAt(0)}
+                  product.reviews.map((r) => {
+                    const reviewPhotos: string[] = r.photosJson
+                      ? (() => {
+                          try {
+                            const parsed = JSON.parse(r.photosJson);
+                            return Array.isArray(parsed) ? parsed : [];
+                          } catch {
+                            return [];
+                          }
+                        })()
+                      : [];
+                    return (
+                      <div key={r.id} className="bg-white rounded-xl p-4 border border-rose-gold/15">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-burgundy-gradient text-white text-sm font-bold flex items-center justify-center">
+                              {r.authorName.charAt(0)}
+                            </div>
+                            <p className="font-bold text-sm text-warm-black">{r.authorName}</p>
                           </div>
-                          <p className="font-bold text-sm text-warm-black">{r.authorName}</p>
+                          <div className="flex gap-0.5">
+                            {[...Array(r.rating)].map((_, i) => (
+                              <Star key={i} className="w-3 h-3 fill-rose-gold text-rose-gold" />
+                            ))}
+                          </div>
                         </div>
-                        <div className="flex gap-0.5">
-                          {[...Array(r.rating)].map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-rose-gold text-rose-gold" />
-                          ))}
-                        </div>
+                        {r.title && <p className="font-bold text-sm text-warm-black mb-1">{r.title}</p>}
+                        <p className="text-sm text-warm-gray leading-relaxed">{r.body}</p>
+                        {reviewPhotos.length > 0 && (
+                          <div className="flex gap-2 mt-3">
+                            {reviewPhotos.map((photo, idx) => (
+                              <div key={idx} className="w-16 h-16 rounded-lg overflow-hidden border border-rose-gold/20">
+                                <img src={photo} alt={`صورة ${idx + 1}`} className="w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      {r.title && <p className="font-bold text-sm text-warm-black mb-1">{r.title}</p>}
-                      <p className="text-sm text-warm-gray leading-relaxed">{r.body}</p>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
@@ -711,6 +763,50 @@ export function ProductDetailView() {
                   onChange={(e) => setReviewForm({ ...reviewForm, body: e.target.value })}
                   className="bg-white min-h-[80px]"
                 />
+
+                {/* Photo upload */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-bold text-warm-black flex items-center gap-1.5">
+                      <Camera className="w-4 h-4 text-burgundy" />
+                      أضف صور (اختياري — حتى 3)
+                    </Label>
+                    {reviewPhotos.length > 0 && (
+                      <span className="text-xs text-warm-gray">{reviewPhotos.length}/3</span>
+                    )}
+                  </div>
+                  {reviewPhotos.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {reviewPhotos.map((photo, idx) => (
+                        <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-rose-gold/30 group">
+                          <img src={photo} alt={`صورة ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setReviewPhotos(reviewPhotos.filter((_, i) => i !== idx))}
+                            className="absolute top-1 left-1 w-5 h-5 rounded-full bg-burgundy text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            aria-label="حذف الصورة"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {reviewPhotos.length < 3 && (
+                    <label className="flex items-center justify-center gap-2 w-full h-20 rounded-lg border-2 border-dashed border-rose-gold/30 hover:border-burgundy/50 hover:bg-rose-gold/5 cursor-pointer transition-colors text-sm text-warm-gray hover:text-burgundy">
+                      <Camera className="w-5 h-5" />
+                      <span>اضغط لإضافة صورة</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+
                 <Button type="submit" disabled={submittingReview} className="bg-burgundy hover:bg-burgundy-deep">
                   {submittingReview ? "جارٍ الإرسال..." : "أرسل المراجعة"}
                 </Button>
