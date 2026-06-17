@@ -21,27 +21,37 @@ import {
   aggregate,
 } from "@/lib/supabase/admin";
 
+/**
+ * Convert a single camelCase string key to snake_case.
+ * (toSnakeCase only works on objects, not strings)
+ */
+function toSnakeKey(key: string): string {
+  return key.replace(/([A-Z])/g, "_$1").toLowerCase();
+}
+
 // ===== Helper: build query filters =====
 function applyFilters(q: any, where: any, table: string): any {
   if (!where) return q;
   for (const [key, value] of Object.entries(where)) {
-    const snakeKey = toSnakeCase(key);
+    const snakeKey = toSnakeKey(key);
     if (value === null) {
       q = q.is(snakeKey, null);
-    } else if (typeof value === "object" && !Array.isArray(value) && value instanceof Date) {
+    } else if (value instanceof Date) {
       q = q.eq(snakeKey, value.toISOString());
     } else if (typeof value === "object" && !Array.isArray(value)) {
       // Prisma-style operators: { gte, lte, gt, lt, neq, in, contains }
       for (const [op, opVal] of Object.entries(value as any)) {
-        if (op === "gte") q = q.gte(snakeKey, opVal);
-        else if (op === "lte") q = q.lte(snakeKey, opVal);
-        else if (op === "gt") q = q.gt(snakeKey, opVal);
-        else if (op === "lt") q = q.lt(snakeKey, opVal);
-        else if (op === "neq") q = q.neq(snakeKey, opVal);
-        else if (op === "in") q = q.in(snakeKey, opVal);
+        // Convert Date to ISO string for Supabase
+        const safeVal = opVal instanceof Date ? opVal.toISOString() : opVal;
+        if (op === "gte") q = q.gte(snakeKey, safeVal);
+        else if (op === "lte") q = q.lte(snakeKey, safeVal);
+        else if (op === "gt") q = q.gt(snakeKey, safeVal);
+        else if (op === "lt") q = q.lt(snakeKey, safeVal);
+        else if (op === "neq") q = q.neq(snakeKey, safeVal);
+        else if (op === "in") q = q.in(snakeKey, safeVal);
         else if (op === "contains") {
           // ILIKE for case-insensitive contains
-          q = q.ilike(snakeKey, `%${opVal}%`);
+          q = q.ilike(snakeKey, `%${safeVal}%`);
         }
       }
     } else {
@@ -58,7 +68,7 @@ export const productRepo = {
     if (opts.where) q = applyFilters(q, opts.where, "products");
     if (opts.orderBy) {
       for (const [col, dir] of Object.entries(opts.orderBy)) {
-        q = q.order(toSnakeCase(col), { ascending: dir === "asc" });
+        q = q.order(toSnakeKey(col), { ascending: dir === "asc" });
       }
     } else {
       q = q.order("created_at", { ascending: false });
@@ -227,7 +237,7 @@ export const orderRepo = {
     if (opts.where) q = applyFilters(q, opts.where, "orders");
     if (opts.orderBy) {
       for (const [col, dir] of Object.entries(opts.orderBy)) {
-        q = q.order(toSnakeCase(col), { ascending: dir === "asc" });
+        q = q.order(toSnakeKey(col), { ascending: dir === "asc" });
       }
     } else {
       q = q.order("created_at", { ascending: false });

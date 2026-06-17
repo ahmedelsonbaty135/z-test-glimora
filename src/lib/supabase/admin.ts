@@ -39,7 +39,7 @@ function toCamelCase(obj: any): any {
 }
 
 /**
- * CamelCase to snake_case converter for inserts/updates
+ * CamelCase to snake_case converter for inserts/updates (objects)
  */
 function toSnakeCase(obj: any): any {
   if (obj === null || typeof obj !== "object") return obj;
@@ -52,6 +52,14 @@ function toSnakeCase(obj: any): any {
   return result;
 }
 
+/**
+ * Convert a single camelCase string key to snake_case.
+ * Use this for string keys (NOT objects).
+ */
+function toSnakeKey(key: string): string {
+  return key.replace(/([A-Z])/g, "_$1").toLowerCase();
+}
+
 // ===== Typed helper for single-table queries with camelCase mapping =====
 export async function selectOne<T = any>(
   table: string,
@@ -60,7 +68,7 @@ export async function selectOne<T = any>(
 ): Promise<T | null> {
   let q = supabaseAdmin.from(table).select(select);
   for (const [key, value] of Object.entries(query)) {
-    q = q.eq(toSnakeCase(key), value);
+    q = q.eq(toSnakeKey(key), value);
   }
   const { data, error } = await q.single();
   if (error) return null;
@@ -82,14 +90,14 @@ export async function selectMany<T = any>(
   let q = supabaseAdmin.from(table).select(opts.select || "*");
   if (opts.eq) {
     for (const [key, value] of Object.entries(opts.eq)) {
-      q = q.eq(toSnakeCase(key), value);
+      q = q.eq(toSnakeKey(key), value);
     }
   }
   if (opts.in) {
-    q = q.in(toSnakeCase(opts.in.column), opts.in.values);
+    q = q.in(toSnakeKey(opts.in.column), opts.in.values);
   }
   if (opts.order) {
-    q = q.order(toSnakeCase(opts.order.column), {
+    q = q.order(toSnakeKey(opts.order.column), {
       ascending: opts.order.ascending ?? false,
     });
   }
@@ -142,7 +150,7 @@ export async function updateRow<T = any>(
 ): Promise<T | null> {
   let q = supabaseAdmin.from(table).update(toSnakeCase(patch));
   for (const [key, value] of Object.entries(eq)) {
-    q = q.eq(toSnakeCase(key), value);
+    q = q.eq(toSnakeKey(key), value);
   }
   const { data, error } = await q.select().single();
   if (error) {
@@ -158,7 +166,7 @@ export async function deleteRows(
 ): Promise<boolean> {
   let q = supabaseAdmin.from(table).delete();
   for (const [key, value] of Object.entries(eq)) {
-    q = q.eq(toSnakeCase(key), value);
+    q = q.eq(toSnakeKey(key), value);
   }
   const { error } = await q;
   if (error) {
@@ -175,7 +183,7 @@ export async function countRows(
   let q = supabaseAdmin.from(table).select("*", { count: "exact", head: true });
   if (eq) {
     for (const [key, value] of Object.entries(eq)) {
-      q = q.eq(toSnakeCase(key), value);
+      q = q.eq(toSnakeKey(key), value);
     }
   }
   const { count, error } = await q;
@@ -196,16 +204,16 @@ export async function aggregate(
   let q = supabaseAdmin.from(table).select(opts.select || "*");
   if (opts.eq) {
     for (const [key, value] of Object.entries(opts.eq)) {
-      q = q.eq(toSnakeCase(key), value);
+      q = q.eq(toSnakeKey(key), value);
     }
   }
   if (opts.neq) {
     for (const [key, value] of Object.entries(opts.neq)) {
-      q = q.neq(toSnakeCase(key), value);
+      q = q.neq(toSnakeKey(key), value);
     }
   }
   if (opts.gte) {
-    q = q.gte(toSnakeCase(opts.gte.column), opts.gte.value);
+    q = q.gte(toSnakeKey(opts.gte.column), opts.gte.value);
   }
   const { data, error } = await q;
   if (error) return [];
