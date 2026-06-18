@@ -44,13 +44,9 @@ type ViewName =
 
 const NAV_ITEMS: { label: string; view: ViewName; category?: string }[] = [
   { label: "الرئيسية", view: "home" },
-  { label: "الأساور", view: "products", category: "bracelets" },
-  { label: "القلائد", view: "products", category: "necklaces" },
-  { label: "الخواتم", view: "products", category: "rings" },
+  { label: "المنتجات", view: "products" },
   { label: "العروض", view: "products", category: "offers" },
   { label: "بطاقات الهدايا", view: "gift-cards" },
-  { label: "من نحن", view: "about" },
-  { label: "اتصل بنا", view: "contact" },
 ];
 
 const MOBILE_NAV_SECTIONS: {
@@ -482,7 +478,7 @@ export function Header() {
             ))}
           </div>
 
-          {/* Account / Admin footer */}
+          {/* Account footer */}
           <div className="border-t border-rose-gold/20 p-3 space-y-2 bg-cream-dark/30">
             {user ? (
               <>
@@ -493,15 +489,6 @@ export function Header() {
                   <User className="w-4 h-4 text-rose-gold-light" />
                   <span className="flex-1 text-right">حسابي ({user.name})</span>
                 </button>
-                {user.role === "ADMIN" && (
-                  <button
-                    onClick={() => handleNavClick("admin")}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold bg-rose-gold text-warm-black hover:bg-rose-gold-light transition-colors"
-                  >
-                    <Package className="w-4 h-4" />
-                    <span className="flex-1 text-right">لوحة الإدارة</span>
-                  </button>
-                )}
                 <button
                   onClick={() => {
                     logout();
@@ -522,13 +509,6 @@ export function Header() {
                 <span className="flex-1 text-right">تسجيل الدخول / حساب جديد</span>
               </button>
             )}
-            <button
-              onClick={() => handleNavClick("admin")}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-cream-dark transition-colors"
-            >
-              <Package className="w-4 h-4" />
-              <span className="flex-1 text-right">دخول لوحة الإدارة</span>
-            </button>
           </div>
         </SheetContent>
       </Sheet>

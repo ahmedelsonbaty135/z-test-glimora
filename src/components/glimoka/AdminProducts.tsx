@@ -136,7 +136,7 @@ export function AdminProducts() {
                 className="flex items-center gap-3 p-3 rounded-xl border border-rose-gold/15 bg-cream-dark/20 hover:bg-cream-dark/40 transition-colors"
               >
                 <div className="w-12 h-12 rounded-lg overflow-hidden bg-cream-dark shrink-0">
-                  {p.images[0] ? (
+                  {p.images && p.images[0] ? (
                     <img src={p.images[0].url} alt={p.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-warm-gray text-xs">لا صورة</div>

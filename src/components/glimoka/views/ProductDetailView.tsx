@@ -169,7 +169,7 @@ export function ProductDetailView() {
     (customization.giftBox ? product.giftBoxPrice : 0) +
     (customization.giftCard ? product.giftCardPrice : 0);
   const isWishlisted = wishlist.includes(product.id);
-  const images = product.images.length > 0 ? product.images : [{ url: "/products/placeholder.jpg", alt: product.name }];
+  const images = product.images && product.images.length > 0 ? product.images : [{ url: "/products/placeholder.jpg", alt: product.name }];
   const isRing = product.category.name.includes("خواتم");
   const metalColor = METAL_COLOR_HEX[customization.metal] || "#C9A87C";
 
@@ -188,7 +188,7 @@ export function ProductDetailView() {
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: images[0].url,
+      image: images[0]?.url || "/products/placeholder.jpg",
       basePrice: product.basePrice,
       unitPrice,
       quantity: qty,

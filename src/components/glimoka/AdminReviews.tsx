@@ -124,7 +124,7 @@ export function AdminReviews() {
               >
                 <div className="flex items-start gap-3">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-cream-dark shrink-0">
-                    {r.product.images[0] ? (
+                    {r.product?.images && r.product.images[0] ? (
                       <img src={r.product.images[0].url} alt={r.product.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full" />

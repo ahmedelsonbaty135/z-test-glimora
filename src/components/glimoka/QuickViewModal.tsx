@@ -87,14 +87,14 @@ export function QuickViewModal({
   const metalAddon = METAL_PRICE_ADDON[metal] || 0;
   const unitPrice = product.basePrice + metalAddon + (giftBox ? product.giftBoxPrice : 0);
   const isWishlisted = wishlist.includes(product.id);
-  const images = product.images.length > 0 ? product.images : [{ url: "/products/placeholder.jpg", alt: product.name }];
+  const images = product.images && product.images.length > 0 ? product.images : [{ url: "/products/placeholder.jpg", alt: product.name }];
 
   const handleAddToCart = () => {
     addToCart({
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: images[0].url,
+      image: images[0]?.url || "/products/placeholder.jpg",
       basePrice: product.basePrice,
       unitPrice,
       quantity: qty,
