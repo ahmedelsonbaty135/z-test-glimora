@@ -90,7 +90,7 @@ interface AdminStats {
 }
 
 export function AdminView() {
-  const { setView } = useShopStore();
+  const { setView, user } = useShopStore();
   const [authed, setAuthed] = useState(false);
   const [pass, setPass] = useState("");
   const [verifying, setVerifying] = useState(false);
