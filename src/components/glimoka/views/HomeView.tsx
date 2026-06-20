@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
+import { useTranslation } from "@/lib/useTranslation";
 import { ProductCard, type ProductCardData } from "../ProductCard";
 import { BundleCard, type Bundle } from "../BundleCard";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ const TESTIMONIALS = [
 
 export function HomeView() {
   const { setView, setCartDrawerOpen, recentlyViewed: recentIds, clearRecentlyViewed } = useShopStore();
+  const { t, lang } = useTranslation();
   const [bestSellers, setBestSellers] = useState<ProductCardData[]>([]);
   const [featured, setFeatured] = useState<ProductCardData[]>([]);
   const [onSale, setOnSale] = useState<ProductCardData[]>([]);
@@ -138,12 +140,12 @@ export function HomeView() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-rose-gold/30">
                 <Sparkles className="w-4 h-4 text-rose-gold-light" />
-                <span className="text-sm font-medium">مجوهرات شخصية فاخرة — صُنعت خصيصًا لك</span>
+                <span className="text-sm font-medium">{lang === "ar" ? "مجوهرات شخصية فاخرة — صُنعت خصيصًا لك" : "Luxury personalized jewelry — crafted just for you"}</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
-                مجوهرات تحمل
-                <span className="block text-gradient-rose mt-1">اسمك بفخر</span>
+                {lang === "ar" ? "مجوهرات تحمل" : "Jewelry That Bears"}
+                <span className="block text-gradient-rose mt-1">{lang === "ar" ? "اسمك بفخر" : "Your Name Proudly"}</span>
               </h1>
 
               <p className="text-lg text-white/80 max-w-lg mx-auto lg:mr-0 leading-relaxed">
@@ -157,7 +159,7 @@ export function HomeView() {
                   onClick={() => setView("products")}
                   className="bg-rose-gold hover:bg-rose-gold-light text-warm-black font-bold text-base px-8 h-12"
                 >
-                  تسوق الآن
+                  {t("shopNow")}
                   <ArrowLeft className="w-5 h-5 mr-1" />
                 </Button>
                 <Button
@@ -167,7 +169,7 @@ export function HomeView() {
                   className="border-white/40 text-white hover:bg-white hover:text-burgundy font-semibold h-12 px-6"
                 >
                   <Gift className="w-5 h-5 ml-1" />
-                  عروض اليوم
+                  {t("todayOffers")}
                 </Button>
               </div>
 
@@ -234,7 +236,7 @@ export function HomeView() {
       <section className="container mx-auto px-4">
         <SectionHeading
           eyebrow="تسوق حسب الفئة"
-          title="اكتشف تشكيلتنا"
+          title={lang === "ar" ? "اكتشف تشكيلتنا" : "Discover Our Collection"}
           subtitle="مجوهرات مخصصة لكل لحظة ومناسبة"
         />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
@@ -258,7 +260,7 @@ export function HomeView() {
                 <h3 className="text-lg sm:text-xl font-bold mb-0.5">{cat.name}</h3>
                 <p className="text-xs text-rose-gold-light">{cat.desc}</p>
                 <span className="inline-flex items-center gap-1 mt-2 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  تسوق الآن <ArrowLeft className="w-3 h-3" />
+                  {t("shopNow")} <ArrowLeft className="w-3 h-3" />
                 </span>
               </div>
             </motion.button>
@@ -271,7 +273,7 @@ export function HomeView() {
         <div className="flex items-end justify-between mb-8 gap-4">
           <SectionHeading
             eyebrow="الأكثر مبيعًا"
-            title="الأكثر طلبًا هذا الأسبوع"
+            title={lang === "ar" ? "الأكثر طلبًا هذا الأسبوع" : "Best Sellers This Week"}
             subtitle="اختيارات عملائنا المفضلة"
             align="right"
           />
@@ -521,19 +523,19 @@ export function HomeView() {
         <section className="container mx-auto px-4">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <p className="text-sm font-bold tracking-wide mb-2 text-rose-gold">تابع التصفح</p>
-              <h2 className="text-2xl sm:text-3xl font-black text-warm-black">شاهدته مؤخرًا</h2>
-              <p className="text-sm text-warm-gray mt-1">استكمل من حيث توقفت</p>
+              <p className="text-sm font-bold tracking-wide mb-2 text-rose-gold">{lang === "ar" ? "تابع التصفح" : "Continue Browsing"}</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-warm-black">{lang === "ar" ? "شاهدته مؤخرًا" : "Recently Viewed"}</h2>
+              <p className="text-sm text-warm-gray mt-1">{lang === "ar" ? "استكمل من حيث توقفت" : "Pick up where you left off"}</p>
             </div>
             <button
               onClick={() => {
                 clearRecentlyViewed();
-                toast.success("تم مسح السجل");
+                toast.success(lang === "ar" ? "تم مسح السجل" : "History cleared");
               }}
               className="text-xs text-warm-gray hover:text-danger-soft transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-cream-dark"
             >
               <X className="w-3.5 h-3.5" />
-              مسح السجل
+              {lang === "ar" ? "مسح السجل" : "Clear History"}
             </button>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -547,7 +549,7 @@ export function HomeView() {
       {/* ===== WHY GLIMOKA — Trust Features ===== */}
       <section className="container mx-auto px-4">
         <SectionHeading
-          eyebrow="لماذا GLIMOKA؟"
+          eyebrow={lang === "ar" ? "لماذا GLIMOKA؟" : "Why GLIMOKA?"}
           title="تجربة فاخرة من البداية للنهاية"
           subtitle="نعدك بأكثر من مجرد مجوهرة — نعدك بتجربة تليق بك"
         />
@@ -838,7 +840,7 @@ function BundlesSection() {
     <section className="container mx-auto px-4">
       <SectionHeading
         eyebrow="عروض حصرية"
-        title="باقات موفّرة"
+        title={lang === "ar" ? "باقات موفّرة" : "Bundle Deals"}
         subtitle="اشترِ مجموعة ووفّر أكثر — مجموعات مختارة بعناية لكل المناسبات"
       />
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">

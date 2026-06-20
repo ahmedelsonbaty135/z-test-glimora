@@ -3,6 +3,7 @@
 import { Heart, ShoppingBag, Star, Eye, GitCompare, Flame } from "lucide-react";
 import { motion } from "framer-motion";
 import { useShopStore, type CartItem } from "@/lib/store";
+import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/button";
 import { cn, formatEGP, discountPercent, METAL_LABELS } from "@/lib/utils";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ export interface ProductCardData {
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const { openProduct, addToCart, toggleWishlist, wishlist, openQuickView, toggleCompare, compareList } = useShopStore();
+  const { t, lang } = useTranslation();
   const image = product.images[0]?.url || "/products/placeholder.jpg";
   const discount = discountPercent(product.basePrice, product.comparePrice);
   const isWishlisted = wishlist.includes(product.id);
@@ -92,7 +94,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         )}
         {product.isBestSeller && (
           <span className="bg-rose-gold text-warm-black text-xs font-bold px-2 py-1 rounded-full shadow">
-            الأكثر مبيعًا
+            {lang === "ar" ? "الأكثر مبيعًا" : "Best Seller"}
           </span>
         )}
       </div>
@@ -147,7 +149,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             }}
             className="text-xs text-white bg-burgundy/90 hover:bg-burgundy px-4 py-2 rounded-full flex items-center gap-1.5 shadow-luxury"
           >
-            <Eye className="w-3.5 h-3.5" /> عرض سريع
+            <Eye className="w-3.5 h-3.5" /> {t("quickView")}
           </button>
         </div>
       </div>
@@ -176,7 +178,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           {(product as any).soldCount > 50 && (
             <span className="text-[10px] text-emerald-soft font-semibold flex items-center gap-0.5">
               <Flame className="w-3 h-3" />
-              {((product as any).soldCount > 200 ? "200+" : (product as any).soldCount)} مبيع
+              {((product as any).soldCount > 200 ? "200+" : (product as any).soldCount)} {lang === "ar" ? "مبيع" : "sold"}
             </span>
           )}
         </div>
@@ -206,12 +208,12 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         {product.stock > 0 && product.stock <= 15 && (
           <div className="mt-2 flex items-center gap-1 text-[10px] text-danger-soft font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-danger-soft animate-pulse" />
-            باقي {product.stock} قطع فقط — اطلب الآن!
+            {t("lowStock", { count: product.stock })}
           </div>
         )}
         {product.stock === 0 && (
           <div className="mt-2 text-[10px] text-danger-soft font-bold">
-            نفد المخزون
+            {t("outOfStock")}
           </div>
         )}
       </div>

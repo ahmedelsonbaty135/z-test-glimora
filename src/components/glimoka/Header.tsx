@@ -27,6 +27,7 @@ import {
   Languages,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
+import { useTranslation } from "@/lib/useTranslation";
 import { BrandLogo } from "./BrandLogo";
 import { cn, formatEGP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -104,6 +105,43 @@ export function Header() {
     toggleTheme,
     toggleLanguage,
   } = useShopStore();
+  const { t, lang } = useTranslation();
+
+  const NAV_ITEMS: { label: string; view: ViewName; category?: string }[] = [
+    { label: t("home"), view: "home" },
+    { label: t("products"), view: "products" },
+    { label: t("offers"), view: "products", category: "offers" },
+    { label: t("giftCards"), view: "gift-cards" },
+    { label: t("sizeGuide"), view: "size-guide" },
+  ];
+  const MOBILE_NAV_SECTIONS: {
+    title: string;
+    items: { label: string; view: ViewName; category?: string; icon: any }[];
+  }[] = [
+    {
+      title: lang === "ar" ? "تسوق" : "Shop",
+      items: [
+        { label: t("home"), view: "home", icon: Home },
+        { label: t("allProducts"), view: "products", icon: Tag },
+        { label: t("bracelets"), view: "products", category: "bracelets", icon: Tag },
+        { label: t("necklaces"), view: "products", category: "necklaces", icon: Tag },
+        { label: t("rings"), view: "products", category: "rings", icon: Tag },
+        { label: t("offers"), view: "products", category: "offers", icon: Tag },
+        { label: t("giftCards"), view: "gift-cards", icon: Gift },
+      ],
+    },
+    {
+      title: lang === "ar" ? "خدمة العملاء" : "Customer Service",
+      items: [
+        { label: t("trackOrder"), view: "track-order", icon: Package },
+        { label: t("faq"), view: "faq", icon: HelpCircle },
+        { label: t("sizeGuide"), view: "size-guide", icon: Ruler },
+        { label: t("shippingPolicy"), view: "shipping-policy", icon: Info },
+        { label: t("returnPolicy"), view: "return-policy", icon: Info },
+        { label: t("contactUs"), view: "contact", icon: Phone },
+      ],
+    },
+  ];
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState("");
@@ -215,7 +253,7 @@ export function Header() {
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden p-2 -mr-2 text-burgundy hover:text-burgundy-light transition-colors"
-              aria-label="القائمة"
+              aria-label={t("menu")}
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -224,7 +262,7 @@ export function Header() {
             <button
               onClick={() => setView("home")}
               className="shrink-0"
-              aria-label="GLIMOKA الرئيسية"
+              aria-label="GLIMOKA"
             >
               <BrandLogo size="md" variant="dark" />
             </button>
@@ -289,7 +327,7 @@ export function Header() {
               <button
                 onClick={() => setSearchOpen((s) => !s)}
                 className="p-2 text-burgundy hover:bg-cream-dark dark:hover:bg-burgundy-light/20 rounded-lg transition-colors"
-                aria-label="بحث"
+                aria-label={t("search")}
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -298,7 +336,7 @@ export function Header() {
               <button
                 onClick={() => setView("account")}
                 className="p-2 text-burgundy hover:bg-cream-dark rounded-lg transition-colors hidden sm:block"
-                aria-label="حسابي"
+                aria-label={t("account")}
               >
                 <User className="w-5 h-5" />
               </button>
@@ -307,7 +345,7 @@ export function Header() {
               <button
                 onClick={() => setView("account")}
                 className="relative p-2 text-burgundy hover:bg-cream-dark rounded-lg transition-colors hidden sm:block"
-                aria-label="المفضلة"
+                aria-label={t("wishlist")}
               >
                 <Heart className="w-5 h-5" />
                 {wishlist.length > 0 && (
@@ -321,7 +359,7 @@ export function Header() {
               <button
                 onClick={() => setCartDrawerOpen(true)}
                 className="relative p-2 text-burgundy hover:bg-cream-dark rounded-lg transition-colors"
-                aria-label="سلة التسوق"
+                aria-label={t("cart")}
               >
                 <ShoppingBag className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -351,7 +389,7 @@ export function Header() {
                       onChange={(e) => setLocalSearch(e.target.value)}
                       onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                      placeholder="ابحث عن سوار، قلادة، خاتم..."
+                      placeholder={t("searchPlaceholder")}
                       className="bg-white border-rose-gold/40 focus-visible:ring-rose-gold"
                     />
                     <Button type="submit" className="bg-burgundy hover:bg-burgundy-deep shrink-0">
@@ -471,7 +509,7 @@ export function Header() {
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-1.5 hover:bg-white/10 rounded-lg"
-                aria-label="إغلاق"
+                aria-label={t("close")}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -520,7 +558,7 @@ export function Header() {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold bg-burgundy text-white hover:bg-burgundy-deep transition-colors"
                 >
                   <User className="w-4 h-4 text-rose-gold-light" />
-                  <span className="flex-1 text-right">حسابي ({user.name})</span>
+                  <span className="flex-1 text-right">{t("account")} ({user.name})</span>
                 </button>
                 <button
                   onClick={() => {
@@ -530,7 +568,7 @@ export function Header() {
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-danger-soft hover:bg-danger-soft/10 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="flex-1 text-right">تسجيل الخروج</span>
+                  <span className="flex-1 text-right">{t("logout")}</span>
                 </button>
               </>
             ) : (
@@ -539,7 +577,7 @@ export function Header() {
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold bg-burgundy text-white hover:bg-burgundy-deep transition-colors"
               >
                 <User className="w-4 h-4 text-rose-gold-light" />
-                <span className="flex-1 text-right">تسجيل الدخول / حساب جديد</span>
+                <span className="flex-1 text-right">{t("login")} / {t("register")}</span>
               </button>
             )}
           </div>

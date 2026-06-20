@@ -2,45 +2,47 @@
 
 import { Instagram, Facebook, Mail, Phone, MapPin, Send, Shield, Truck, RotateCcw, CreditCard } from "lucide-react";
 import { useShopStore } from "@/lib/store";
+import { useTranslation } from "@/lib/useTranslation";
 import { BrandLogo } from "./BrandLogo";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const FOOTER_LINKS: { title: string; links: { label: string; view: "about" | "contact" | "faq" | "shipping-policy" | "return-policy" | "track-order" | "size-guide" | "products" | "home" | "gift-cards" | "compare" }[] }[] = [
-  {
-    title: "تسوق",
-    links: [
-      { label: "كل المنتجات", view: "products" },
-      { label: "الأساور", view: "products" },
-      { label: "القلائد", view: "products" },
-      { label: "الخواتم", view: "products" },
-      { label: "العروض", view: "products" },
-      { label: "بطاقات الهدايا", view: "gift-cards" },
-    ],
-  },
-  {
-    title: "خدمة العملاء",
-    links: [
-      { label: "اتصل بنا", view: "contact" },
-      { label: "الأسئلة الشائعة", view: "faq" },
-      { label: "تتبع الطلب", view: "track-order" },
-      { label: "دليل المقاسات", view: "size-guide" },
-      { label: "سياسة الشحن", view: "shipping-policy" },
-      { label: "سياسة الإرجاع", view: "return-policy" },
-    ],
-  },
-  {
-    title: "عن GLIMOKA",
-    links: [
-      { label: "من نحن", view: "about" },
-      { label: "الرئيسية", view: "home" },
-    ],
-  },
-];
-
 export function Footer() {
   const { setView } = useShopStore();
+  const { t, lang } = useTranslation();
   const [email, setEmail] = useState("");
+
+  const FOOTER_LINKS: { title: string; links: { label: string; view: any }[] }[] = [
+    {
+      title: lang === "ar" ? "تسوق" : "Shop",
+      links: [
+        { label: t("allProducts"), view: "products" },
+        { label: t("bracelets"), view: "products" },
+        { label: t("necklaces"), view: "products" },
+        { label: t("rings"), view: "products" },
+        { label: t("offers"), view: "products" },
+        { label: t("giftCards"), view: "gift-cards" },
+      ],
+    },
+    {
+      title: lang === "ar" ? "خدمة العملاء" : "Customer Service",
+      links: [
+        { label: t("contactUs"), view: "contact" },
+        { label: t("faq"), view: "faq" },
+        { label: t("trackOrder"), view: "track-order" },
+        { label: t("sizeGuide"), view: "size-guide" },
+        { label: t("shippingPolicy"), view: "shipping-policy" },
+        { label: t("returnPolicy"), view: "return-policy" },
+      ],
+    },
+    {
+      title: lang === "ar" ? "عن GLIMOKA" : "About GLIMOKA",
+      links: [
+        { label: t("aboutUs"), view: "about" },
+        { label: t("home"), view: "home" },
+      ],
+    },
+  ];
 
   const subscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,10 +60,10 @@ export function Footer() {
       <div className="border-b border-white/10">
         <div className="container mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { icon: Shield, title: "ضمان الجودة", desc: "خامات أصلية مضمونة" },
-            { icon: Truck, title: "شحن لكل مصر", desc: "2-5 أيام عمل" },
-            { icon: CreditCard, title: "الدفع عند الاستلام", desc: "ادفع وقت التوصيل" },
-            { icon: RotateCcw, title: "إرجاع خلال 14 يوم", desc: "رضاك أولويتنا" },
+            { icon: Shield, title: lang === "ar" ? "ضمان الجودة" : "Quality Guarantee", desc: lang === "ar" ? "خامات أصلية مضمونة" : "Authentic materials" },
+            { icon: Truck, title: lang === "ar" ? "شحن لكل مصر" : "Shipping to All Egypt", desc: lang === "ar" ? "2-5 أيام عمل" : "2-5 business days" },
+            { icon: CreditCard, title: lang === "ar" ? "الدفع عند الاستلام" : "Cash on Delivery", desc: lang === "ar" ? "ادفع وقت التوصيل" : "Pay on delivery" },
+            { icon: RotateCcw, title: lang === "ar" ? "إرجاع خلال 14 يوم" : "14-Day Returns", desc: lang === "ar" ? "رضاك أولويتنا" : "Your satisfaction first" },
           ].map((b) => (
             <div key={b.title} className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
@@ -148,7 +150,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/50 text-center sm:text-right">
-            © {new Date().getFullYear()} GLIMOKA. جميع الحقوق محفوظة. صُنع بحب في مصر 🇪🇬
+            © {new Date().getFullYear()} GLIMOKA. {lang === "ar" ? "جميع الحقوق محفوظة. صُنع بحب في مصر" : "All Rights Reserved. Made with love in Egypt"} 🇪🇬
           </p>
           <div className="flex items-center gap-3">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 hover:bg-rose-gold hover:text-warm-black flex items-center justify-center transition-colors" aria-label="Instagram">
