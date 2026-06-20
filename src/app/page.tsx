@@ -31,7 +31,15 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const { view, setView } = useShopStore();
+  const { view, setView, theme, language } = useShopStore();
+
+  // Apply theme + language on mount and when they change
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  }, [theme, language]);
 
   // Update document title based on view
   useEffect(() => {

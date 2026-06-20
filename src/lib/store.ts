@@ -120,6 +120,10 @@ interface ShopState {
   // Search history
   recentSearches: string[]; // last 5 searches
 
+  // Theme & Language
+  theme: "light" | "dark";
+  language: "ar" | "en";
+
   // Actions
   setView: (view: ViewName, opts?: { slug?: string; category?: string }) => void;
   openProduct: (slug: string) => void;
@@ -166,6 +170,10 @@ interface ShopState {
   toggleBackInStockSub: (productId: string) => void;
   addRecentSearch: (q: string) => void;
   clearRecentSearches: () => void;
+  toggleTheme: () => void;
+  setTheme: (t: "light" | "dark") => void;
+  toggleLanguage: () => void;
+  setLanguage: (l: "ar" | "en") => void;
 }
 
 function makeLineId(item: Omit<CartItem, "id">) {
@@ -210,6 +218,9 @@ export const useShopStore = create<ShopState>()(
       cartReminderDismissed: false,
 
       recentSearches: [],
+
+      theme: "light",
+      language: "ar",
 
       setView: (view, opts) => {
         set({
@@ -370,6 +381,35 @@ export const useShopStore = create<ShopState>()(
         set({ recentSearches: [trimmed, ...existing].slice(0, 5) });
       },
       clearRecentSearches: () => set({ recentSearches: [] }),
+
+      toggleTheme: () => {
+        const newTheme = get().theme === "light" ? "dark" : "light";
+        set({ theme: newTheme });
+        if (typeof document !== "undefined") {
+          document.documentElement.classList.toggle("dark", newTheme === "dark");
+        }
+      },
+      setTheme: (t) => {
+        set({ theme: t });
+        if (typeof document !== "undefined") {
+          document.documentElement.classList.toggle("dark", t === "dark");
+        }
+      },
+      toggleLanguage: () => {
+        const newLang = get().language === "ar" ? "en" : "ar";
+        set({ language: newLang });
+        if (typeof document !== "undefined") {
+          document.documentElement.lang = newLang;
+          document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
+        }
+      },
+      setLanguage: (l) => {
+        set({ language: l });
+        if (typeof document !== "undefined") {
+          document.documentElement.lang = l;
+          document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
+        }
+      },
     }),
     {
       name: "glimoka-shop",
@@ -389,6 +429,8 @@ export const useShopStore = create<ShopState>()(
         cartLastUpdated: s.cartLastUpdated,
         cartReminderDismissed: s.cartReminderDismissed,
         recentSearches: s.recentSearches,
+        theme: s.theme,
+        language: s.language,
       }),
     }
   )

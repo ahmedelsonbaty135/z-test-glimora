@@ -22,6 +22,9 @@ import {
   Gift,
   Clock,
   TrendingUp,
+  Sun,
+  Moon,
+  Languages,
 } from "lucide-react";
 import { useShopStore } from "@/lib/store";
 import { BrandLogo } from "./BrandLogo";
@@ -96,6 +99,10 @@ export function Header() {
     recentSearches,
     addRecentSearch,
     clearRecentSearches,
+    theme,
+    language,
+    toggleTheme,
+    toggleLanguage,
   } = useShopStore();
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -252,10 +259,36 @@ export function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-0.5 sm:gap-1">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-burgundy hover:bg-cream-dark dark:hover:bg-burgundy-light/20 rounded-lg transition-colors"
+                aria-label={theme === "light" ? "Dark Mode" : "Light Mode"}
+                title={theme === "light" ? "الوضع الليلي" : "الوضع النهاري"}
+              >
+                {theme === "light" ? (
+                  <Moon className="w-5 h-5" />
+                ) : (
+                  <Sun className="w-5 h-5 text-rose-gold-light" />
+                )}
+              </button>
+
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs font-bold text-burgundy hover:bg-cream-dark dark:hover:bg-burgundy-light/20 rounded-lg transition-colors"
+                aria-label="Switch Language"
+                title={language === "ar" ? "English" : "العربية"}
+              >
+                <Languages className="w-4 h-4" />
+                <span className="hidden sm:inline">{language === "ar" ? "EN" : "ع"}</span>
+              </button>
+
+              {/* Search */}
               <button
                 onClick={() => setSearchOpen((s) => !s)}
-                className="p-2 text-burgundy hover:bg-cream-dark rounded-lg transition-colors"
+                className="p-2 text-burgundy hover:bg-cream-dark dark:hover:bg-burgundy-light/20 rounded-lg transition-colors"
                 aria-label="بحث"
               >
                 <Search className="w-5 h-5" />
