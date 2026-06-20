@@ -386,13 +386,13 @@ export const useShopStore = create<ShopState>()(
         const newTheme = get().theme === "light" ? "dark" : "light";
         set({ theme: newTheme });
         if (typeof document !== "undefined") {
-          document.documentElement.classList.toggle("dark", newTheme === "dark");
+          document.documentElement.setAttribute("data-theme", newTheme);
         }
       },
       setTheme: (t) => {
         set({ theme: t });
         if (typeof document !== "undefined") {
-          document.documentElement.classList.toggle("dark", t === "dark");
+          document.documentElement.setAttribute("data-theme", t);
         }
       },
       toggleLanguage: () => {

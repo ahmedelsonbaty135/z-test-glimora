@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-theme="dark"] *));
 
 @theme inline {
   --color-background: var(--background);
@@ -10,18 +10,18 @@
   --font-brand: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* GLIMOKA Brand Palette */
-  --color-burgundy: #6A1B35;
-  --color-burgundy-deep: #4A1124;
-  --color-burgundy-light: #8B3A4F;
-  --color-rose-gold: #C9A87C;
-  --color-rose-gold-light: #E0C9A8;
-  --color-cream: #FAF6F2;
-  --color-cream-dark: #F5EDE6;
-  --color-warm-gray: #6B5560;
-  --color-warm-black: #2D1A1F;
-  --color-emerald-soft: #10B981;
-  --color-danger-soft: #9B2C2C;
+  /* GLIMOKA Brand Palette — uses CSS variables so dark mode overrides work */
+  --color-burgundy: var(--c-burgundy);
+  --color-burgundy-deep: var(--c-burgundy-deep);
+  --color-burgundy-light: var(--c-burgundy-light);
+  --color-rose-gold: var(--c-rose-gold);
+  --color-rose-gold-light: var(--c-rose-gold-light);
+  --color-cream: var(--c-cream);
+  --color-cream-dark: var(--c-cream-dark);
+  --color-warm-gray: var(--c-warm-gray);
+  --color-warm-black: var(--c-warm-black);
+  --color-emerald-soft: var(--c-emerald);
+  --color-danger-soft: var(--c-danger);
 
   /* shadcn tokens mapped to GLIMOKA */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -59,21 +59,37 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ===== LIGHT MODE (default) ===== */
 :root {
   --radius: 0.75rem;
-  --background: #FAF6F2;            /* cream */
-  --foreground: #2D1A1F;            /* warm black */
+
+  /* Brand colors */
+  --c-burgundy: #6A1B35;
+  --c-burgundy-deep: #4A1124;
+  --c-burgundy-light: #8B3A4F;
+  --c-rose-gold: #C9A87C;
+  --c-rose-gold-light: #E0C9A8;
+  --c-cream: #FAF6F2;
+  --c-cream-dark: #F5EDE6;
+  --c-warm-gray: #6B5560;
+  --c-warm-black: #2D1A1F;
+  --c-emerald: #10B981;
+  --c-danger: #9B2C2C;
+
+  /* shadcn tokens */
+  --background: #FAF6F2;
+  --foreground: #2D1A1F;
   --card: #FFFFFF;
   --card-foreground: #2D1A1F;
   --popover: #FFFFFF;
   --popover-foreground: #2D1A1F;
-  --primary: #6A1B35;               /* burgundy */
+  --primary: #6A1B35;
   --primary-foreground: #FFFFFF;
-  --secondary: #F5EDE6;             /* cream dark */
+  --secondary: #F5EDE6;
   --secondary-foreground: #2D1A1F;
   --muted: #F5EDE6;
-  --muted-foreground: #6B5560;      /* warm gray */
-  --accent: #C9A87C;                /* rose gold */
+  --muted-foreground: #6B5560;
+  --accent: #C9A87C;
   --accent-foreground: #2D1A1F;
   --destructive: #9B2C2C;
   --destructive-foreground: #FFFFFF;
@@ -95,7 +111,22 @@
   --sidebar-ring: #C9A87C;
 }
 
-.dark {
+/* ===== DARK MODE ===== */
+[data-theme="dark"] {
+  /* Brand colors — inverted for dark mode */
+  --c-burgundy: #C9A87C;
+  --c-burgundy-deep: #8B3A4F;
+  --c-burgundy-light: #E0C9A8;
+  --c-rose-gold: #C9A87C;
+  --c-rose-gold-light: #E0C9A8;
+  --c-cream: #1A1115;
+  --c-cream-dark: #2D1A1F;
+  --c-warm-gray: #B89B9F;
+  --c-warm-black: #FAF6F2;
+  --c-emerald: #10B981;
+  --c-danger: #EF4444;
+
+  /* shadcn tokens */
   --background: #1A1115;
   --foreground: #FAF6F2;
   --card: #2D1A1F;
@@ -110,11 +141,16 @@
   --muted-foreground: #C9A87C;
   --accent: #C9A87C;
   --accent-foreground: #1A1115;
-  --destructive: #9B2C2C;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
   --border: #4A2A33;
   --input: #4A2A33;
   --ring: #C9A87C;
+  --chart-1: #C9A87C;
+  --chart-2: #8B3A4F;
+  --chart-3: #6A1B35;
+  --chart-4: #10B981;
+  --chart-5: #EF4444;
   --sidebar: #2D1A1F;
   --sidebar-foreground: #FAF6F2;
   --sidebar-primary: #C9A87C;
@@ -123,17 +159,6 @@
   --sidebar-accent-foreground: #FAF6F2;
   --sidebar-border: #4A2A33;
   --sidebar-ring: #C9A87C;
-
-  /* Override brand colors for dark mode */
-  --color-cream: #1A1115;
-  --color-cream-dark: #2D1A1F;
-  --color-warm-gray: #B89B9F;
-  --color-warm-black: #FAF6F2;
-  --color-burgundy: #C9A87C;
-  --color-burgundy-deep: #8B3A4F;
-  --color-burgundy-light: #E0C9A8;
-  --color-rose-gold: #C9A87C;
-  --color-rose-gold-light: #E0C9A8;
 }
 
 @layer base {

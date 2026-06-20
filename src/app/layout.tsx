@@ -3,6 +3,7 @@ import { Cairo, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { ThemeInitializer } from "@/components/glimoka/ThemeInitializer";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -52,10 +53,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" data-theme="light" suppressHydrationWarning>
       <body
         className={`${cairo.variable} ${inter.variable} font-sans antialiased bg-background text-foreground`}
       >
+        <ThemeInitializer />
         {children}
         <Toaster />
         <SonnerToaster
